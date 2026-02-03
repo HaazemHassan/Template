@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesContracts;
 using YallaKhadra.Core.Bases.Responses;
-using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Core.Features.Users.Queries.Models;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
@@ -14,29 +13,29 @@ namespace YallaKhadra.Core.Features.Users.Queries.Handlers {
                                     IRequestHandler<GetUsersPaginatedQuery, PaginatedResult<GetUsersPaginatedResponse>>,
                                     IRequestHandler<GetUserByIdQuery, Response<GetUserByIdResponse>>,
                                     IRequestHandler<CheckEmailAvailabilityQuery, Response<CheckEmailAvailabilityResponse>> {
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IMapper _mapper;
         private readonly IApplicationUserService _applicationUserService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
 
-        public UserQueryHandler(UserManager<ApplicationUser> userManager, IMapper mapper, IApplicationUserService applicationUserService, ICurrentUserService currentUserService) {
-            _userManager = userManager;
+        public UserQueryHandler(IMapper mapper, IApplicationUserService applicationUserService, ICurrentUserService currentUserService, IUserRepository userRepository) {
             _mapper = mapper;
             _applicationUserService = applicationUserService;
             _currentUserService = currentUserService;
+            _userRepository = userRepository;
         }
 
         public async Task<PaginatedResult<GetUsersPaginatedResponse>> Handle(GetUsersPaginatedQuery request, CancellationToken cancellationToken) {
 
-            var usersQuerable = _userManager.Users;
-            var usersPaginatedResult = await usersQuerable.ProjectTo<GetUsersPaginatedResponse>(_mapper.ConfigurationProvider)
-                                                          .ToPaginatedResultAsync(request.PageNumber, request.PageSize);
+            var usersQuerable = _userRepository.GetTableNoTracking()
+                                                .ProjectTo<GetUsersPaginatedResponse>(_mapper.ConfigurationProvider);
+            var usersPaginatedResult = await _userRepository.GetPaginatedListAsync(usersQuerable, request.PageNumber, request.PageSize);
             return usersPaginatedResult;
 
         }
 
         public async Task<Response<GetUserByIdResponse>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken) {
-            var user = await _userManager.FindByIdAsync(request.Id.ToString());
+            var user = await _userRepository.GetByIdAsync(request.Id);
             if (user is null)
                 return NotFound<GetUserByIdResponse>();
 
@@ -46,7 +45,7 @@ namespace YallaKhadra.Core.Features.Users.Queries.Handlers {
 
 
         public async Task<Response<CheckEmailAvailabilityResponse>> Handle(CheckEmailAvailabilityQuery request, CancellationToken cancellationToken) {
-            var user = await _userManager.FindByEmailAsync(request.Email);
+            var user = await _userRepository.GetAsync(u => u.Email == request.Email);
             var response = new CheckEmailAvailabilityResponse {
                 IsAvailable = user is null
             };

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 
 namespace YallaKhadra.Core.Entities.IdentityEntities {
     public class ApplicationRole : IdentityRole<int> {

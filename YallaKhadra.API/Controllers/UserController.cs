@@ -62,7 +62,7 @@ namespace YallaKhadra.API.Controllers {
         /// <response code="200">Returns user details</response>
         /// <response code="404">User not found</response>
         /// <response code="400">Invalid user ID format</response>
-        [HttpGet("id/{id:int}")]
+        [HttpGet("{Id:int}")]
         [ProducesResponseType(typeof(Response<GetUserByIdResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

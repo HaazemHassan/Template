@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using System.Linq.Expressions;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Infrastructure.Data;
 
 namespace YallaKhadra.Infrastructure.Repositories {
@@ -26,14 +26,6 @@ namespace YallaKhadra.Infrastructure.Repositories {
         }
         public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate) {
             return await _dbContext.Set<T>().AnyAsync(predicate);
-        }
-        public IQueryable<T> GetTableNoTracking(Expression<Func<T, bool>>? predicate = null) {
-            var query = _dbContext.Set<T>().AsNoTracking();
-            return predicate is not null ? query.Where(predicate) : query;
-        }
-        public IQueryable<T> GetTableAsTracking(Expression<Func<T, bool>>? predicate = null) {
-            var query = _dbContext.Set<T>();
-            return predicate is not null ? query.Where(predicate) : query;
         }
 
         public virtual async Task<T> AddAsync(T entity) {
@@ -61,20 +53,26 @@ namespace YallaKhadra.Infrastructure.Repositories {
             }
         }
 
-        public async Task SaveChangesAsync() {
-            await _dbContext.SaveChangesAsync();
+
+        public IQueryable<T> GetTableNoTracking() {
+            return _dbSet.AsNoTracking().AsQueryable();
         }
 
-        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken) {
-            return await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-        }
 
-        public async Task CommitAsync() {
-            await _dbContext.Database.CommitTransactionAsync();
-        }
+        public async Task<PaginatedResult<TResult>> GetPaginatedListAsync<TResult>(IQueryable<TResult> source, int pageNumber, int pageSize) where TResult : class {
+            if (source == null) {
+                throw new ArgumentNullException(nameof(source));
+            }
 
-        public async Task RollBackAsync() {
-            await _dbContext.Database.RollbackTransactionAsync();
+            pageNumber = pageNumber <= 0 ? 1 : pageNumber;
+            pageSize = pageSize <= 0 ? 10 : pageSize;
+
+            int count = await source.CountAsync();
+            if (count == 0)
+                return PaginatedResult<TResult>.Success(new List<TResult>(), count, pageNumber, pageSize);
+
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return PaginatedResult<TResult>.Success(items, count, pageNumber, pageSize);
         }
     }
 }

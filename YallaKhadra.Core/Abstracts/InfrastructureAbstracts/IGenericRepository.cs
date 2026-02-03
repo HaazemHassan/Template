@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
+using YallaKhadra.Core.Bases.Responses;
 
 namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 
@@ -13,11 +13,7 @@ public interface IGenericRepository<T> where T : class {
     Task<T?> GetByIdAsync(int id);
     Task<T?> GetAsync(Expression<Func<T, bool>> predicate);
     Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
-    IQueryable<T> GetTableNoTracking(Expression<Func<T, bool>>? predicate = null);
-    IQueryable<T> GetTableAsTracking(Expression<Func<T, bool>>? predicate = null);
-    Task SaveChangesAsync();
-    Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
-    Task CommitAsync();
-    Task RollBackAsync();
+    IQueryable<T> GetTableNoTracking();
+    Task<PaginatedResult<TResult>> GetPaginatedListAsync<TResult>(IQueryable<TResult> source, int pageNumber, int pageSize) where TResult : class;
 
 }

@@ -31,8 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\" />
-    <Folder Include="Identity\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

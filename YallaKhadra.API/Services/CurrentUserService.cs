@@ -1,17 +1,20 @@
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Entities.IdentityEntities;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Enums;
+using YallaKhadra.Infrastructure.Data;
 
 namespace YallaKhadra.API.Services {
     public class CurrentUserService : ICurrentUserService {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly AppDbContext _dbContext;
+        private readonly IUserRepository _userRepository;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager) {
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext, IUserRepository userRepository) {
             _httpContextAccessor = httpContextAccessor;
-            _userManager = userManager;
+            _dbContext = dbContext;
+            _userRepository = userRepository;
         }
 
         public int? UserId {
@@ -27,11 +30,10 @@ namespace YallaKhadra.API.Services {
         public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
 
-        public async Task<ApplicationUser?> GetCurrentUserAsync() {
-            var principal = _httpContextAccessor.HttpContext?.User;
-            if (principal == null) return null;
-
-            return await _userManager.GetUserAsync(principal);
+        public async Task<User?> GetCurrentUserAsync() {
+            if (!IsAuthenticated || UserId == null)
+                return null;
+            return await _userRepository.GetByIdAsync(UserId.Value);
         }
 
         public IList<UserRole> GetRoles() {

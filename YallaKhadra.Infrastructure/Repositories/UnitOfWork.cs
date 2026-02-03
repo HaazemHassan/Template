@@ -17,25 +17,9 @@ public class UnitOfWork : IUnitOfWork {
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken) {
+    public async Task<IDatabaseTransaction> BeginTransactionAsync(CancellationToken cancellationToken) {
         _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-        return _transaction;
+        return new DataBaseTransaction(_transaction);
     }
 
-    public async Task CommitAsync(CancellationToken cancellationToken) {
-        if (_transaction != null)
-            await _transaction.CommitAsync(cancellationToken);
-    }
-
-    public async Task RollbackAsync(CancellationToken cancellationToken) {
-        if (_transaction != null)
-            await _transaction.RollbackAsync(cancellationToken);
-    }
-
-    public async ValueTask DisposeAsync() {
-        if (_transaction != null)
-            await _transaction.DisposeAsync();
-
-        await _context.DisposeAsync();
-    }
 }

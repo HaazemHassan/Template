@@ -3,9 +3,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Abstracts.ServicesContracts;
 using YallaKhadra.Core.Entities.IdentityEntities;
+using YallaKhadra.Infrastructure.Abstracts;
 using YallaKhadra.Infrastructure.Data;
 using YallaKhadra.Infrastructure.Repositories;
+using YallaKhadra.Infrastructure.Services;
+using YallaKhadra.Services.Services;
 
 namespace YallaKhadra.Infrastructure;
 
@@ -16,6 +20,10 @@ public static class InfrastructureDependencyRegisteration {
         DbContextServiceConfiguations(services, configuration);
         RepositoryServiceConfiguations(services);
         IdentityServiceConfiguations(services);
+
+        services.AddTransient<IApplicationUserService, ApplicationUserService>();
+        services.AddTransient<IAuthenticationService, AuthenticationService>();
+
         return services;
 
     }
@@ -63,6 +71,7 @@ public static class InfrastructureDependencyRegisteration {
         services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddTransient<IUnitOfWork, UnitOfWork>();
         services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddTransient<IUserRepository, UserRepository>();
 
 
 

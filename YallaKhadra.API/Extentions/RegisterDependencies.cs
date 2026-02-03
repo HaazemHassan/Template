@@ -27,8 +27,8 @@ namespace YallaKhadra.API.Extentions {
 
             //Other Layers Dependency Registrations
             services.InfrastrctureLayerDepenedencyRegistration(configuration);
-            services.ServiceLayerDependencyRegistration(configuration);
-            services.CoreLayerDependencyRegistration(configuration);
+            services.ServiceLayerDependencyRegistration();
+            services.CoreLayerDependencyRegistration();
 
 
 

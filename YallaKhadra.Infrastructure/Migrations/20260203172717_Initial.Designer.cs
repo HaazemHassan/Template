@@ -12,8 +12,8 @@ using YallaKhadra.Infrastructure.Data;
 namespace YallaKhadra.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260201181735_First migration")]
-    partial class Firstmigration
+    [Migration("20260203172717_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -169,15 +169,12 @@ namespace YallaKhadra.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("DomainUserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -185,14 +182,6 @@ namespace YallaKhadra.Infrastructure.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -217,9 +206,6 @@ namespace YallaKhadra.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("PointsBalance")
-                        .HasColumnType("int");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -232,6 +218,10 @@ namespace YallaKhadra.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DomainUserId")
+                        .IsUnique()
+                        .HasFilter("[DomainUserId] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -240,10 +230,10 @@ namespace YallaKhadra.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
+                    b.ToTable("AspNetUsers", "identity");
                 });
 
-            modelBuilder.Entity("YallaKhadra.Core.Entities.IdentityEntities.RefreshToken", b =>
+            modelBuilder.Entity("YallaKhadra.Core.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -275,6 +265,41 @@ namespace YallaKhadra.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RefreshToken");
+                });
+
+            modelBuilder.Entity("YallaKhadra.Core.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -328,7 +353,17 @@ namespace YallaKhadra.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("YallaKhadra.Core.Entities.IdentityEntities.RefreshToken", b =>
+            modelBuilder.Entity("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", b =>
+                {
+                    b.HasOne("YallaKhadra.Core.Entities.User", "DomainUser")
+                        .WithOne()
+                        .HasForeignKey("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", "DomainUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("DomainUser");
+                });
+
+            modelBuilder.Entity("YallaKhadra.Core.Entities.RefreshToken", b =>
                 {
                     b.HasOne("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", "User")
                         .WithMany("RefreshTokens")
