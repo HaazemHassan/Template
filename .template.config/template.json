@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Hazem",
+  "classifications": [ "Web", "Clean Architecture" ],
+  "identity": "Yalla.Reference.Template",
+  "name": "Reference project Template",
+  "shortName": "reference",
+  "sourceName": "YallaKhadra",
+  "preferNameDirectory": true,
+  "symbols": {},
+  "sources": [
+    {
+      "source": "./",
+      "target": "./",
+      "exclude": [
+        "**/.vs/**",
+        "**/bin/**",
+        "**/obj/**"
+      ]
+    }
+  ]
+}
