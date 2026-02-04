@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using YallaKhadra.Core.Bases.Responses;
+using YallaKhadra.Core.Bases.Pagination;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Models {
-    public class GetUsersPaginatedQuery : IRequest<PaginatedResult<GetUsersPaginatedResponse>> {
-        public int PageNumber { get; set; } = 1;
-        public int PageSize { get; set; } = 10;
+    public class GetUsersPaginatedQuery : PaginatedQuery, IRequest<PaginatedResult<GetUsersPaginatedResponse>> {
+
     }
 }

@@ -2,7 +2,7 @@
 using MediatR;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesContracts;
+using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Authentication.Commands.RequestsModels;

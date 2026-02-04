@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesContracts;
+using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Entities;

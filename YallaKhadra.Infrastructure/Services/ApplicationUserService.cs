@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesContracts;
+using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases;
 using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Entities.IdentityEntities;
@@ -12,15 +12,13 @@ namespace YallaKhadra.Infrastructure.Services {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IClientContextService _clientContextService;
         private readonly ICurrentUserService _currentUserService;
-        private readonly IUserRepository _userRepository;
         private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public ApplicationUserService(IUnitOfWork unitOfWork, IClientContextService clientContextService, ICurrentUserService currentUserService, IUserRepository userRepository, UserManager<ApplicationUser> userManager) {
+        public ApplicationUserService(IUnitOfWork unitOfWork, IClientContextService clientContextService, ICurrentUserService currentUserService, UserManager<ApplicationUser> userManager) {
             _unitOfWork = unitOfWork;
             _clientContextService = clientContextService;
             _currentUserService = currentUserService;
-            _userRepository = userRepository;
             _userManager = userManager;
         }
 
@@ -31,12 +29,12 @@ namespace YallaKhadra.Infrastructure.Services {
                 role = UserRole.User;
 
             // Check if email already exists
-            if (await _userRepository.AnyAsync(x => x.Email == user.Email))
+            if (await _unitOfWork.Users.AnyAsync(x => x.Email == user.Email))
                 return ServiceOperationResult<User>.
                     Failure(ServiceOperationStatus.AlreadyExists, "Email already exists.");
 
             // Check if phone number already exists
-            if (await _userRepository.AnyAsync(x => x.PhoneNumber == user.PhoneNumber))
+            if (await _unitOfWork.Users.AnyAsync(x => x.PhoneNumber == user.PhoneNumber))
                 return ServiceOperationResult<User>.
                     Failure(ServiceOperationStatus.AlreadyExists, "This phone number is used.");
 

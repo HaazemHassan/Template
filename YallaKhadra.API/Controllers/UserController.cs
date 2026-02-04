@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using YallaKhadra.API.Bases;
 using YallaKhadra.API.Filters;
 using YallaKhadra.Core.Bases.Authentication;
+using YallaKhadra.Core.Bases.Pagination;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Enums;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
@@ -14,7 +15,6 @@ namespace YallaKhadra.API.Controllers {
     /// <summary>
     /// User management controller for handling user operations
     /// </summary>
-    [ApiController]
     public class UserController : BaseController {
 
 
@@ -88,8 +88,6 @@ namespace YallaKhadra.API.Controllers {
             var result = await Mediator.Send(query);
             return NewResult(result);
         }
-
-
 
 
         [HttpPost("add-user")]

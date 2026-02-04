@@ -13,7 +13,6 @@ namespace YallaKhadra.Controllers {
     /// <summary>
     /// Authentication controller for handling user login and token management
     /// </summary>
-    [ApiController]
     public class AuthenticationController : BaseController {
         private readonly JwtSettings _jwtSettings;
         private readonly IClientContextService _clientContextService;
@@ -22,9 +21,6 @@ namespace YallaKhadra.Controllers {
             _jwtSettings = jwtSettings;
             _clientContextService = clientContextService;
         }
-
-
-
 
         /// <summary>
         /// Authenticate a user with username and password
@@ -84,8 +80,6 @@ namespace YallaKhadra.Controllers {
 
             return NewResult(result);
         }
-
-
 
 
         [HttpPost("logout")]

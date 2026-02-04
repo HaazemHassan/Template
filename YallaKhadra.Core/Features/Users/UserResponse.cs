@@ -9,9 +9,6 @@ namespace YallaKhadra.Core.Features.Users {
 
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public int PointsBalance { get; set; }
-
-
 
     }
 }

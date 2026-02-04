@@ -1,4 +1,4 @@
-﻿namespace YallaKhadra.Core.Bases.Responses;
+﻿namespace YallaKhadra.Core.Bases.Pagination;
 
 public class PaginatedResult<T> {
     public List<T>? Data { get; set; }

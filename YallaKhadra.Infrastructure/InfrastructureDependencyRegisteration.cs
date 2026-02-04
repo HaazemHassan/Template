@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesContracts;
+using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Infrastructure.Abstracts;
 using YallaKhadra.Infrastructure.Data;
@@ -68,10 +68,13 @@ public static class InfrastructureDependencyRegisteration {
 
 
     private static IServiceCollection RepositoryServiceConfiguations(this IServiceCollection services) {
-        services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
-        services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddTransient<IUserRepository, UserRepository>();
+
+        // UnitOfWork should be Scoped to maintain consistency across a single request
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
 
 

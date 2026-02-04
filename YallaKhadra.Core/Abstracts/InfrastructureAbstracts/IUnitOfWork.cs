@@ -1,8 +1,12 @@
-﻿namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+﻿
+namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 
 public interface IUnitOfWork {
 
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
-    Task<IDatabaseTransaction> BeginTransactionAsync(CancellationToken cancellationToken);
+    // Repository Properties
+    IUserRepository Users { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    Task<IDatabaseTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 
 }

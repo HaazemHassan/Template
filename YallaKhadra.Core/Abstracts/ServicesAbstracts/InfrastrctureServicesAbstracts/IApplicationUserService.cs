@@ -2,7 +2,7 @@
 using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Enums;
 
-namespace YallaKhadra.Core.Abstracts.ServicesContracts {
+namespace YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts {
     public interface IApplicationUserService {
         public Task<ServiceOperationResult<User>> AddUser(User user, string password, UserRole role = UserRole.User);
         //public Task<bool> SendConfirmationEmailAsync(ApplicationUser user);
