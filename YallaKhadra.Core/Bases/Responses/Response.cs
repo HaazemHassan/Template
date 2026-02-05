@@ -19,7 +19,7 @@ namespace YallaKhadra.Core.Bases.Responses {
         public object? Meta { get; set; }
 
         public bool Succeeded { get; set; }
-        public string Message { get; set; }
+        public string Message { get; set; } = string.Empty;
         public List<string>? Errors { get; set; }
         public string? ErrorCode { get; set; }
 
@@ -27,7 +27,7 @@ namespace YallaKhadra.Core.Bases.Responses {
     public class Response<T> : Response {
         public Response() : base() {
         }
-        public Response(T data, string? message = null) {
+        public Response(T data, string message) {
             Succeeded = true;
             Message = message;
             Data = data;

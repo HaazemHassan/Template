@@ -4,13 +4,13 @@ using YallaKhadra.Core.Entities;
 using YallaKhadra.Infrastructure.Data;
 
 namespace YallaKhadra.Infrastructure.Repositories {
-    public class UserRepository : GenericRepository<User>, IUserRepository {
+    public class UserRepository : GenericRepository<DomainUser>, IUserRepository {
 
-        private readonly DbSet<User> _users;
+        private readonly DbSet<DomainUser> _users;
 
 
         public UserRepository(AppDbContext context) : base(context) {
-            _users = context.Set<User>();
+            _users = context.Set<DomainUser>();
         }
 
     }

@@ -2,13 +2,11 @@
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
 
 namespace YallaKhadra.API.Services {
-    public class ClientContextService : IClientContextService {
+    public class ClientContextService(IHttpContextAccessor httpContextAccessor) : IClientContextService {
 
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public ClientContextService(IHttpContextAccessor httpContextAccessor) {
-            _httpContextAccessor = httpContextAccessor;
-        }
-        public string GetClientIpAddress() {
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
+        public string? GetClientIpAddress() {
             HttpContext? context = _httpContextAccessor.HttpContext;
             if (context is null)
                 return null;
@@ -35,8 +33,7 @@ namespace YallaKhadra.API.Services {
 
         public bool IsWebClient() {
             var request = _httpContextAccessor.HttpContext?.Request;
-            return request is not null ? request.Headers.TryGetValue("X-Client-Type", out var headerValue) && headerValue == "Web" : false;
-
+            return request is not null && request.Headers.TryGetValue("X-Client-Type", out var headerValue) && headerValue == "Web";
         }
     }
 }

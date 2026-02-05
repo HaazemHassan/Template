@@ -5,9 +5,8 @@ using YallaKhadra.Core.Features.Users.Commands.Responses;
 namespace YallaKhadra.Core.Mapping.Users {
     public partial class UserProfile {
         public void AddUserMapping() {
-            CreateMap<AddUserCommand, User>();
-            CreateMap<User, AddUserResponse>();
-
+            CreateMap<AddUserCommand, DomainUser>();
+            CreateMap<DomainUser, AddUserResponse>();
         }
     }
 }

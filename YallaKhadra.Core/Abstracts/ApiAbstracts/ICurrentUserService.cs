@@ -7,7 +7,7 @@ public interface ICurrentUserService {
     int? UserId { get; }
     string? Email { get; }
     bool IsAuthenticated { get; }
-    Task<User?> GetCurrentUserAsync();
+    Task<DomainUser?> GetCurrentUserAsync();
     IList<UserRole> GetRoles();
     bool IsInRole(UserRole roleName);
 }

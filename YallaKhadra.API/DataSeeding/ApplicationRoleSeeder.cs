@@ -1,19 +1,24 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using YallaKhadra.Core.Entities.IdentityEntities;
 
-namespace YallaKhadra.API.Bases.DataSeeding {
+namespace YallaKhadra.API.DataSeeding {
 
 
     public static class ApplicationRoleSeeder {
 
         public static async Task SeedAsync(RoleManager<ApplicationRole> _roleManager) {
-            string rolesJson = await File.ReadAllTextAsync("ApplicationRoles.json");
 
-            List<string>? roles =
-                JsonSerializer.Deserialize<List<string>>(rolesJson);
+            int rolesCount = await _roleManager.Roles.CountAsync();
+            if (rolesCount > 0)
+                return;
 
-            if (roles is null)
+            string rolesJson = await File.ReadAllTextAsync("DataSeeding/Roles.json");
+
+            List<string>? roles = JsonSerializer.Deserialize<List<string>>(rolesJson);
+
+            if (roles is null || roles.Count <= 0)
                 return;
 
             var normalizedRoles = roles.Where(r => !string.IsNullOrWhiteSpace(r))
@@ -26,9 +31,6 @@ namespace YallaKhadra.API.Bases.DataSeeding {
                     roleInDb = new ApplicationRole(role);
                     await _roleManager.CreateAsync(roleInDb);
                 }
-
-
-
             }
         }
     }

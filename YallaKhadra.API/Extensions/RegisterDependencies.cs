@@ -16,7 +16,7 @@ using YallaKhadra.Services;
 
 
 
-namespace YallaKhadra.API.Extentions {
+namespace YallaKhadra.API.Extensions {
     public static class RegisterDependencies {
         private const string GuestIdKey = "GuestId";   // used for ratelimiting
 
@@ -34,16 +34,16 @@ namespace YallaKhadra.API.Extentions {
 
             //Service Configurations
             AuthenticationServiceConfiguations(services, configuration);
-            SwaggerServiceConfiguations(services, configuration);
+            SwaggerServiceConfiguations(services);
             //EmailServiceConfiguations(services, configuration);
-            AutorizationServiceConfiguations(services, configuration);
-            RateLimitingDependencyConfigurations(services, configuration);
+            AutorizationServiceConfiguations(services);
+            RateLimitingDependencyConfigurations(services);
             return services;
 
         }
 
 
-        private static IServiceCollection SwaggerServiceConfiguations(this IServiceCollection services, IConfiguration configuration) {
+        private static IServiceCollection SwaggerServiceConfiguations(this IServiceCollection services) {
             // Swagger Configuration
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options => {
@@ -118,19 +118,17 @@ namespace YallaKhadra.API.Extentions {
 
             return services;
         }
-        private static IServiceCollection AutorizationServiceConfiguations(this IServiceCollection services, IConfiguration configuration) {
-            services.AddAuthorization(options => {
-                options.AddPolicy("ResetPasswordPolicy", policy => {
+        private static IServiceCollection AutorizationServiceConfiguations(this IServiceCollection services) {
+            services.AddAuthorizationBuilder()
+                .AddPolicy("ResetPasswordPolicy", policy => {
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("purpose", "reset-password");
                 });
-
-            });
             return services;
         }
 
         public static IServiceCollection RateLimitingDependencyConfigurations(
-         this IServiceCollection services, IConfiguration configuration) {
+         this IServiceCollection services) {
 
             services.AddRateLimiter(options => {
                 options.AddPolicy("defaultLimiter", httpContext => {
@@ -203,17 +201,15 @@ namespace YallaKhadra.API.Extentions {
 
             return services;
 
-            string GetFallbackPartitionKey(HttpContext httpContext) {
+            static string GetFallbackPartitionKey(HttpContext httpContext) {
                 var clientContextService = httpContext.RequestServices.GetRequiredService<IClientContextService>();
                 var ip = clientContextService.GetClientIpAddress();
-                var userAgent = httpContext.Request.Headers["User-Agent"].FirstOrDefault() ?? "unknown";
+                var userAgent = httpContext.Request.Headers.UserAgent;
 
                 var identifier = $"{ip}-{userAgent}";
-                using (var sha256 = SHA256.Create()) {
-                    var bytes = Encoding.UTF8.GetBytes(identifier);
-                    var hash = sha256.ComputeHash(bytes);
-                    return Convert.ToBase64String(hash);
-                }
+                var bytes = Encoding.UTF8.GetBytes(identifier);
+                var hash = SHA256.HashData(bytes);
+                return Convert.ToBase64String(hash);
             }
         }
 

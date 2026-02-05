@@ -3,7 +3,7 @@ using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Specefications {
-    public class UserDetailsProjectionSpec : Specification<User, GetUserByIdResponse> {
+    public class UserDetailsProjectionSpec : Specification<DomainUser, GetUserByIdResponse> {
         public UserDetailsProjectionSpec(int userId) {
             Query.Where(u => u.Id == userId);
 

@@ -4,7 +4,7 @@ using YallaKhadra.Core.Extensions;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Specefications {
-    public class UsersFilterPaginatedSpec : Specification<User, GetUsersPaginatedResponse> {
+    public class UsersFilterPaginatedSpec : Specification<DomainUser, GetUsersPaginatedResponse> {
         public UsersFilterPaginatedSpec(int pageNumber, int pageSize, string? search, string? sortBy) {
             if (!string.IsNullOrEmpty(search)) {
                 Query.Where(u => u.FirstName.Contains(search) || u.Email.Contains(search));

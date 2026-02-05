@@ -8,19 +8,14 @@ using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Authentication.Commands.RequestsModels;
 
-namespace YallaKhadra.Controllers {
+namespace YallaKhadra.API.Controllers {
 
     /// <summary>
     /// Authentication controller for handling user login and token management
     /// </summary>
-    public class AuthenticationController : BaseController {
-        private readonly JwtSettings _jwtSettings;
-        private readonly IClientContextService _clientContextService;
-
-        public AuthenticationController(JwtSettings jwtSettings, IClientContextService clientContextService) {
-            _jwtSettings = jwtSettings;
-            _clientContextService = clientContextService;
-        }
+    public class AuthenticationController(JwtSettings jwtSettings, IClientContextService clientContextService) : BaseController {
+        private readonly JwtSettings _jwtSettings = jwtSettings;
+        private readonly IClientContextService _clientContextService = clientContextService;
 
         /// <summary>
         /// Authenticate a user with username and password

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using YallaKhadra.API.Bases.DataSeeding;
-using YallaKhadra.API.Extentions;
+using YallaKhadra.API.DataSeeding;
+using YallaKhadra.API.Extensions;
 using YallaKhadra.API.Middlewares;
 using YallaKhadra.Core.Entities.IdentityEntities;
 
@@ -16,21 +16,22 @@ namespace YallaKhadra.API {
 
             var app = builder.Build();
 
-            #region Initialize Database
-            using (var scope = app.Services.CreateScope()) {
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-
-                await ApplicationRoleSeeder.SeedAsync(roleManager);
-                await ApplicationUserSeeder.SeedAsync(userManager);
-
-            }
-            #endregion
-
             if (app.Environment.IsDevelopment()) {
-                app.UseSwagger();
 
+                #region Initialize Database
+                using (var scope = app.Services.CreateScope()) {
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+                    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
+                    await ApplicationRoleSeeder.SeedAsync(roleManager);
+                    await UserSeeder.SeedAsync(userManager);
+
+                }
+                #endregion
+
+                app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseErrorHandling();

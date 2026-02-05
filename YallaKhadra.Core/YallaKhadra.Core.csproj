@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Folder Include="Abstracts\ServicesAbstracts\DomainServicesAbstracts\" />
+    <Folder Include="Bases\Validations\" />
     <Folder Include="Mapping\Authentication\CommandMapping\" />
     <Folder Include="Mapping\Authentication\QueryMapping\" />
   </ItemGroup>

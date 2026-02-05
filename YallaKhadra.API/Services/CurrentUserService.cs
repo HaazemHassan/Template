@@ -3,17 +3,14 @@ using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Enums;
-using YallaKhadra.Infrastructure.Data;
 
 namespace YallaKhadra.API.Services {
     public class CurrentUserService : ICurrentUserService {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly AppDbContext _dbContext;
         private readonly IUserRepository _userRepository;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext, IUserRepository userRepository) {
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository) {
             _httpContextAccessor = httpContextAccessor;
-            _dbContext = dbContext;
             _userRepository = userRepository;
         }
 
@@ -30,7 +27,7 @@ namespace YallaKhadra.API.Services {
         public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
 
-        public async Task<User?> GetCurrentUserAsync() {
+        public async Task<DomainUser?> GetCurrentUserAsync() {
             if (!IsAuthenticated || UserId == null)
                 return null;
             return await _userRepository.GetByIdAsync(UserId.Value);

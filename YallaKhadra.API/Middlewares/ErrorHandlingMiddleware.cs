@@ -1,5 +1,4 @@
 using FluentValidation;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -7,12 +6,8 @@ using System.Text.Json;
 using YallaKhadra.Core.Bases.Responses;
 
 namespace YallaKhadra.API.Middlewares {
-    public class ErrorHandlingMiddleware {
-        private readonly RequestDelegate _next;
-
-        public ErrorHandlingMiddleware(RequestDelegate next) {
-            _next = next;
-        }
+    public class ErrorHandlingMiddleware(RequestDelegate next) {
+        private readonly RequestDelegate _next = next;
 
         public async Task Invoke(HttpContext context) {
             try {
@@ -21,7 +16,7 @@ namespace YallaKhadra.API.Middlewares {
             catch (Exception error) {
                 var response = context.Response;
                 response.ContentType = "application/json";
-                var responseModel = new Response<string>() { Succeeded = false, Message = error?.Message };
+                var responseModel = new Response<string>() { Succeeded = false, Message = error?.Message! };
                 //TODO:: cover all validation errors
                 switch (error) {
                     case UnauthorizedAccessException e:
@@ -36,7 +31,7 @@ namespace YallaKhadra.API.Middlewares {
                     responseModel.Message = error.Message;
                     responseModel.StatusCode = HttpStatusCode.UnprocessableEntity;
                     response.StatusCode = (int)HttpStatusCode.UnprocessableEntity;
-                    responseModel.Errors = e.Errors.Select(err => err.ErrorMessage).ToList();
+                    responseModel.Errors = [.. e.Errors.Select(err => err.ErrorMessage)];
                     break;
                     case KeyNotFoundException e:
                     // not found error
@@ -75,7 +70,7 @@ namespace YallaKhadra.API.Middlewares {
 
                     default:
                     // unhandled error
-                    responseModel.Message = error.Message;
+                    responseModel.Message = error?.Message ?? "Something went wrong";
                     responseModel.StatusCode = HttpStatusCode.InternalServerError;
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     break;

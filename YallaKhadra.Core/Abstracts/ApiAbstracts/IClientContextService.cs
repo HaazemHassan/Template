@@ -8,7 +8,7 @@ namespace YallaKhadra.Core.Abstracts.ApiAbstracts {
         /// Gets the real client IP address, considering proxy/load balancer headers
         /// </summary>
         /// <returns>The client IP address as string</returns>
-        string GetClientIpAddress();
+        string? GetClientIpAddress();
 
         /// <summary>
         /// Checks if the request is coming from a web client

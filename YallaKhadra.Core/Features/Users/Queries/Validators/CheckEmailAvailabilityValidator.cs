@@ -1,4 +1,5 @@
 using FluentValidation;
+using YallaKhadra.Core.Extensions.Validations;
 using YallaKhadra.Core.Features.Users.Queries.Models;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Validators {
@@ -8,11 +9,7 @@ namespace YallaKhadra.Core.Features.Users.Queries.Validators {
         }
 
         public void ApplyValidationRules() {
-            RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("{PropertyName} can't be empty")
-                .NotNull().WithMessage("{PropertyName} is required")
-                .EmailAddress().WithMessage("{PropertyName} is not a valid email address")
-                .MaximumLength(100).WithMessage("{PropertyName} cannot exceed 100 characters");
+            RuleFor(x => x.Email).ApplyEmailRules(isRequired: true);
         }
     }
 }

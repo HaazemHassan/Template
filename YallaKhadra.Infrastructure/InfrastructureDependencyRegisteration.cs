@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
+using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Infrastructure.Abstracts;
 using YallaKhadra.Infrastructure.Data;
@@ -19,7 +20,7 @@ public static class InfrastructureDependencyRegisteration {
 
         DbContextServiceConfiguations(services, configuration);
         RepositoryServiceConfiguations(services);
-        IdentityServiceConfiguations(services);
+        IdentityServiceConfiguations(services, configuration);
 
         services.AddTransient<IApplicationUserService, ApplicationUserService>();
         services.AddTransient<IAuthenticationService, AuthenticationService>();
@@ -38,16 +39,21 @@ public static class InfrastructureDependencyRegisteration {
     }
 
 
-    private static IServiceCollection IdentityServiceConfiguations(IServiceCollection services) {
+    private static IServiceCollection IdentityServiceConfiguations(IServiceCollection services, IConfiguration configuration) {
+
+        // Bind Password Settings from appsettings.json
+        var passwordSettings = new PasswordSettings();
+        configuration.GetSection(PasswordSettings.SectionName).Bind(passwordSettings);
+        services.AddSingleton(passwordSettings);
 
         services.AddIdentity<ApplicationUser, ApplicationRole>(option => {
-            // Password settings.
-            option.Password.RequireDigit = false;
-            option.Password.RequireLowercase = false;
-            option.Password.RequireNonAlphanumeric = false;
-            option.Password.RequireUppercase = false;
-            option.Password.RequiredLength = 3;
-            option.Password.RequiredUniqueChars = 1;
+            // Password settings 
+            option.Password.RequireDigit = passwordSettings.RequireDigit;
+            option.Password.RequireLowercase = passwordSettings.RequireLowercase;
+            option.Password.RequireNonAlphanumeric = passwordSettings.RequireNonAlphanumeric;
+            option.Password.RequireUppercase = passwordSettings.RequireUppercase;
+            option.Password.RequiredLength = passwordSettings.MinLength;
+            option.Password.RequiredUniqueChars = passwordSettings.RequiredUniqueChars;
 
             // Lockout settings.
             option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
