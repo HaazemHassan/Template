@@ -2,7 +2,6 @@
 
 public interface IUnitOfWork {
 
-    // Repository Properties
     IUserRepository Users { get; }
     IRefreshTokenRepository RefreshTokens { get; }
 

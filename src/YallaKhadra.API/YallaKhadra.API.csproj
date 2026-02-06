@@ -20,7 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\YallaKhadra.Core\YallaKhadra.Core.csproj" />
     <ProjectReference Include="..\YallaKhadra.Infrastructure\YallaKhadra.Infrastructure.csproj" />
-    <ProjectReference Include="..\YallaKhadra.Services\YallaKhadra.Services.csproj" />
   </ItemGroup>
 
 </Project>
