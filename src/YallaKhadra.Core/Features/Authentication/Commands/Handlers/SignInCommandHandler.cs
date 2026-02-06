@@ -1,5 +1,4 @@
 using MediatR;
-using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
