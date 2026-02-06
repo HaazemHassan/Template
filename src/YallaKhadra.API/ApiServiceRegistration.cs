@@ -5,6 +5,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using YallaKhadra.Api.Filters;
 using YallaKhadra.API.Auhtorization;
 using YallaKhadra.API.RateLimiting;
 using YallaKhadra.API.Services;
@@ -29,8 +30,6 @@ namespace YallaKhadra.API {
             services.AddInfrastructure(configuration);
             services.AddDomainServices();
             services.AddCore();
-
-
 
             return services;
 
@@ -63,6 +62,7 @@ namespace YallaKhadra.API {
                     Version = "v1",
                     Description = "API for YallaKhadra application"
                 });
+                options.OperationFilter<SwaggerExcludeOperationFilter>();
 
                 //options.EnableAnnotations();
 
