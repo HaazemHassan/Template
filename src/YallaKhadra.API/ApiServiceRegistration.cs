@@ -14,7 +14,6 @@ using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Infrastructure;
-using YallaKhadra.Services;
 
 
 
@@ -28,7 +27,6 @@ namespace YallaKhadra.API {
 
             //Other Layers Dependency Registrations
             services.AddInfrastructure(configuration);
-            services.AddDomainServices();
             services.AddCore();
 
             return services;
