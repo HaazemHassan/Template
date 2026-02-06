@@ -5,6 +5,8 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.RateLimiting;
+using YallaKhadra.API.Auhtorization;
+using YallaKhadra.API.RateLimiting;
 using YallaKhadra.API.Services;
 using YallaKhadra.Core;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
@@ -16,34 +18,43 @@ using YallaKhadra.Services;
 
 
 
-namespace YallaKhadra.API.Extensions {
-    public static class RegisterDependencies {
+namespace YallaKhadra.API {
+    public static class ApiServiceRegistration {
         private const string GuestIdKey = "GuestId";   // used for ratelimiting
 
-        public static IServiceCollection DependenciesRegistration(this IServiceCollection services, IConfiguration configuration) {
-            //API Layer Dependency Registrations
-            services.AddTransient<ICurrentUserService, CurrentUserService>();
-            services.AddTransient<IClientContextService, ClientContextService>();
+        public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration) {
+            AddApi(services, configuration);
 
             //Other Layers Dependency Registrations
-            services.InfrastrctureLayerDepenedencyRegistration(configuration);
-            services.ServiceLayerDependencyRegistration();
-            services.CoreLayerDependencyRegistration();
+            services.AddInfrastructure(configuration);
+            services.AddDomainServices();
+            services.AddCore();
 
 
 
-            //Service Configurations
-            AuthenticationServiceConfiguations(services, configuration);
-            SwaggerServiceConfiguations(services);
-            //EmailServiceConfiguations(services, configuration);
-            AutorizationServiceConfiguations(services);
-            RateLimitingDependencyConfigurations(services);
             return services;
 
         }
 
+        private static IServiceCollection AddApi(IServiceCollection services, IConfiguration configuration) {
 
-        private static IServiceCollection SwaggerServiceConfiguations(this IServiceCollection services) {
+            AddAuthenticationConfigurations(services, configuration);
+            AddSwaggerConfigurations(services);
+            AddAutorizationConfigurations(services);
+            AddRateLimitingConfigurations(services, configuration);
+
+
+            #region Api Services
+            services.AddTransient<ICurrentUserService, CurrentUserService>();
+            services.AddTransient<IClientContextService, ClientContextService>();
+            #endregion
+
+            return services;
+        }
+
+
+
+        private static IServiceCollection AddSwaggerConfigurations(IServiceCollection services) {
             // Swagger Configuration
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options => {
@@ -86,7 +97,7 @@ namespace YallaKhadra.API.Extensions {
         }
 
 
-        private static IServiceCollection AuthenticationServiceConfiguations(this IServiceCollection services, IConfiguration configuration) {
+        private static IServiceCollection AddAuthenticationConfigurations(IServiceCollection services, IConfiguration configuration) {
             //JWT Authentication
             var jwtSettings = new JwtSettings();
             configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
@@ -118,20 +129,28 @@ namespace YallaKhadra.API.Extensions {
 
             return services;
         }
-        private static IServiceCollection AutorizationServiceConfiguations(this IServiceCollection services) {
+        private static IServiceCollection AddAutorizationConfigurations(IServiceCollection services) {
             services.AddAuthorizationBuilder()
-                .AddPolicy("ResetPasswordPolicy", policy => {
+                .AddPolicy(AuthorizationPolicies.ResetPassword, policy => {
                     policy.RequireAuthenticatedUser();
                     policy.RequireClaim("purpose", "reset-password");
+                })
+                .AddPolicy(AuthorizationPolicies.SameUserOrAdmin, policy => {
+                    policy.RequireAuthenticatedUser();
+                    policy.AddRequirements(new SameUserOrAdminRequirement());
                 });
             return services;
         }
 
-        public static IServiceCollection RateLimitingDependencyConfigurations(
-         this IServiceCollection services) {
+        public static IServiceCollection AddRateLimitingConfigurations(
+         this IServiceCollection services, IConfiguration configuration) {
+
+            var rateLimitingSettings = new RateLimitingSettings();
+            configuration.GetSection(nameof(RateLimitingSettings)).Bind(rateLimitingSettings);
+            services.AddSingleton(rateLimitingSettings);
 
             services.AddRateLimiter(options => {
-                options.AddPolicy("defaultLimiter", httpContext => {
+                options.AddPolicy(RateLimitingPolicies.DefaultLimiter, httpContext => {
                     string partitionKey;
                     var user = httpContext.User?.Identity?.Name;
 
@@ -146,15 +165,15 @@ namespace YallaKhadra.API.Extensions {
 
 
                     return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, key => new SlidingWindowRateLimiterOptions {
-                        Window = TimeSpan.FromMinutes(1),
-                        PermitLimit = 90,
-                        QueueLimit = 10,
+                        Window = TimeSpan.FromMinutes(rateLimitingSettings.DefaultLimiter.WindowMinutes),
+                        PermitLimit = rateLimitingSettings.DefaultLimiter.PermitLimit,
+                        QueueLimit = rateLimitingSettings.DefaultLimiter.QueueLimit,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        SegmentsPerWindow = 4
+                        SegmentsPerWindow = rateLimitingSettings.DefaultLimiter.SegmentsPerWindow
                     });
                 });
 
-                options.AddPolicy("loginLimiter", httpContext => {
+                options.AddPolicy(RateLimitingPolicies.LoginLimiter, httpContext => {
                     string partitionKey;
 
                     if (httpContext.Items.TryGetValue(GuestIdKey, out var guestId) && guestId is string guestIdString)
@@ -165,11 +184,11 @@ namespace YallaKhadra.API.Extensions {
 
 
                     return RateLimitPartition.GetSlidingWindowLimiter(partitionKey, key => new SlidingWindowRateLimiterOptions {
-                        Window = TimeSpan.FromMinutes(1),
-                        PermitLimit = 5,
-                        QueueLimit = 0,
+                        Window = TimeSpan.FromMinutes(rateLimitingSettings.LoginLimiter.WindowMinutes),
+                        PermitLimit = rateLimitingSettings.LoginLimiter.PermitLimit,
+                        QueueLimit = rateLimitingSettings.LoginLimiter.QueueLimit,
                         QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                        SegmentsPerWindow = 4
+                        SegmentsPerWindow = rateLimitingSettings.LoginLimiter.SegmentsPerWindow
                     });
                 });
 
@@ -181,7 +200,7 @@ namespace YallaKhadra.API.Extensions {
                     context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
                     context.HttpContext.Response.ContentType = "application/json";
 
-                    int retryAfterSeconds = 60;
+                    int retryAfterSeconds = rateLimitingSettings.RetryAfterSeconds;
                     if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter)) {
                         retryAfterSeconds = (int)Math.Ceiling(retryAfter.TotalSeconds);
                     }

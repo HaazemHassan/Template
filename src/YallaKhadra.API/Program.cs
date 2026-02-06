@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using YallaKhadra.API.DataSeeding;
-using YallaKhadra.API.Extensions;
 using YallaKhadra.API.Middlewares;
 using YallaKhadra.Core.Entities.IdentityEntities;
 
@@ -11,7 +10,7 @@ namespace YallaKhadra.API {
 
 
             builder.Services.AddControllers();
-            builder.Services.DependenciesRegistration(builder.Configuration);
+            builder.Services.AddServices(builder.Configuration);
 
 
             var app = builder.Build();

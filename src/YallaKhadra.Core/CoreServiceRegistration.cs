@@ -5,9 +5,8 @@ using System.Reflection;
 using YallaKhadra.Core.Bases;
 
 namespace YallaKhadra.Core {
-    public static class CoreDependencyRegisteration {
-        public static IServiceCollection CoreLayerDependencyRegistration(this IServiceCollection services) {
-
+    public static class CoreServiceRegistration {
+        public static IServiceCollection AddCore(this IServiceCollection services) {
 
             services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));

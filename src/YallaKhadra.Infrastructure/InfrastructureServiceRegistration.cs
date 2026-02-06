@@ -14,34 +14,29 @@ using YallaKhadra.Services.Services;
 
 namespace YallaKhadra.Infrastructure;
 
-public static class InfrastructureDependencyRegisteration {
+public static class InfrastructureServiceRegistration {
 
-    public static IServiceCollection InfrastrctureLayerDepenedencyRegistration(this IServiceCollection services, IConfiguration configuration) {
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration) {
 
-        DbContextServiceConfiguations(services, configuration);
-        RepositoryServiceConfiguations(services);
-        IdentityServiceConfiguations(services, configuration);
-
-        services.AddTransient<IApplicationUserService, ApplicationUserService>();
-        services.AddTransient<IAuthenticationService, AuthenticationService>();
+        AddDbContextConfiguations(services, configuration);
+        AddIdentityConfigurations(services, configuration);
+        AddRepositories(services);
+        AddServices(services);
 
         return services;
-
     }
 
 
-    private static IServiceCollection DbContextServiceConfiguations(IServiceCollection services, IConfiguration configuration) {
+    private static void AddDbContextConfiguations(IServiceCollection services, IConfiguration configuration) {
         services.AddDbContext<AppDbContext>(options => {
             options.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]);
         });
 
-        return services;
     }
 
 
-    private static IServiceCollection IdentityServiceConfiguations(IServiceCollection services, IConfiguration configuration) {
+    private static IServiceCollection AddIdentityConfigurations(IServiceCollection services, IConfiguration configuration) {
 
-        // Bind Password Settings from appsettings.json
         var passwordSettings = new PasswordSettings();
         configuration.GetSection(PasswordSettings.SectionName).Bind(passwordSettings);
         services.AddSingleton(passwordSettings);
@@ -73,7 +68,7 @@ public static class InfrastructureDependencyRegisteration {
     }
 
 
-    private static IServiceCollection RepositoryServiceConfiguations(this IServiceCollection services) {
+    private static IServiceCollection AddRepositories(IServiceCollection services) {
 
         // UnitOfWork should be Scoped to maintain consistency across a single request
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -83,6 +78,13 @@ public static class InfrastructureDependencyRegisteration {
         services.AddScoped<IUserRepository, UserRepository>();
 
 
+
+        return services;
+    }
+
+    private static IServiceCollection AddServices(IServiceCollection services) {
+        services.AddTransient<IApplicationUserService, ApplicationUserService>();
+        services.AddTransient<IAuthenticationService, AuthenticationService>();
 
         return services;
     }
