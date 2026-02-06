@@ -149,16 +149,17 @@ namespace YallaKhadra.Services.Services {
             var refreshToken = GenerateRefreshToken(appUser.Id, refreshTokenExpDate);
             await AddRefreshTokenToDatabase(refreshToken, jwtSecurityToken.Id);
 
-            AuthResult jwtResult = new AuthResult {
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-                RefreshToken = refreshToken,
-                User = new GetUserByIdResponse {
-                    Id = appUser.DomainUserId.Value,
-                    Email = appUser.DomainUser.Email,
-                    Address = appUser.DomainUser.Address!,
-                    PhoneNumber = appUser.DomainUser.PhoneNumber!
-                }
+            //prepare response
+            string accessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            var userResponse = new GetUserByIdResponse {
+                Id = appUser.DomainUserId.Value,
+                Email = appUser.DomainUser.Email,
+                Address = appUser.DomainUser.Address!,
+                PhoneNumber = appUser.DomainUser.PhoneNumber!
             };
+            AuthResult jwtResult = new AuthResult(accessToken, refreshToken, userResponse);
+
+
             return ServiceOperationResult<AuthResult>.Success(jwtResult, message: "Logged in successfully");
         }
 
@@ -233,19 +234,6 @@ namespace YallaKhadra.Services.Services {
             return response;
         }
 
-        private async Task<AuthResult?> GeneratePasswordResetToken(ApplicationUser user) {
-            if (user is null)
-                return null;
-
-            var userClaims = await GetUserClaims(user);
-            userClaims.Add(new Claim("purpose", "reset-password"));
-            var jwtSecurityToken = await GenerateAccessToken(user, userClaims, DateTime.UtcNow.AddMinutes(5));
-
-            AuthResult jwtResult = new AuthResult {
-                AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken),
-            };
-            return jwtResult;
-        }
 
         #endregion
 
