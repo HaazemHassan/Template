@@ -1,4 +1,4 @@
-namespace YallaKhadra.Core.Bases.Authentication {
+namespace YallaKhadra.API.RateLimiting {
     public class RateLimitingSettings {
         public DefaultLimiterSettings DefaultLimiter { get; set; } = new();
         public LoginLimiterSettings LoginLimiter { get; set; } = new();

@@ -2,19 +2,13 @@
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
 namespace YallaKhadra.Core.Bases.Authentication {
-    public class AuthResult {
-
-        public AuthResult(string accessToken, RefreshTokenDTO refreshToken, GetUserByIdResponse user) {
-            AccessToken = accessToken;
-            RefreshToken = refreshToken;
-            User = user;
-        }
-        public string AccessToken { get; set; }
+    public class AuthResult(string accessToken, RefreshTokenDTO refreshToken, GetUserByIdResponse user) {
+        public string AccessToken { get; set; } = accessToken;
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public RefreshTokenDTO? RefreshToken { get; set; }
+        public RefreshTokenDTO? RefreshToken { get; set; } = refreshToken;
 
-        public GetUserByIdResponse User { get; set; }
+        public GetUserByIdResponse User { get; set; } = user;
     }
 
 

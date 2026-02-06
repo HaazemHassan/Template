@@ -1,5 +1,5 @@
-﻿using YallaKhadra.Core.Bases;
-using YallaKhadra.Core.Entities;
+﻿using YallaKhadra.Core.Bases.Responses;
+using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Enums;
 
 namespace YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts {

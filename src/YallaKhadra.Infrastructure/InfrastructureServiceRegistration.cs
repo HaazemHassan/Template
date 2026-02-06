@@ -6,11 +6,9 @@ using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Entities.IdentityEntities;
-using YallaKhadra.Infrastructure.Abstracts;
 using YallaKhadra.Infrastructure.Data;
 using YallaKhadra.Infrastructure.Repositories;
 using YallaKhadra.Infrastructure.Services;
-using YallaKhadra.Services.Services;
 
 namespace YallaKhadra.Infrastructure;
 

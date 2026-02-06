@@ -1,5 +1,5 @@
 using Ardalis.Specification;
-using YallaKhadra.Core.Entities;
+using YallaKhadra.Core.Entities.UserEntities;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Specefications {
     public class UsersFilterCountSpec : Specification<DomainUser> {

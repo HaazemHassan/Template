@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 
-namespace YallaKhadra.Core.Bases {
+namespace YallaKhadra.Core.Bases.Validations {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
   where TRequest : IRequest<TResponse> {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
@@ -23,7 +23,7 @@ namespace YallaKhadra.Core.Bases {
 
                 }
             }
-            return await next();
+            return await next(cancellationToken);
         }
     }
 }

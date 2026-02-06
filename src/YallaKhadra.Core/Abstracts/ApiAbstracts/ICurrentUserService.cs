@@ -1,4 +1,4 @@
-using YallaKhadra.Core.Entities;
+using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Enums;
 
 namespace YallaKhadra.Core.Abstracts.ApiAbstracts;

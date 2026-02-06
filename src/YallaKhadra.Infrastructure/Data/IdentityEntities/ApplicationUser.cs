@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
+using YallaKhadra.Core.Entities.UserEntities;
 
 namespace YallaKhadra.Core.Entities.IdentityEntities {
     public class ApplicationUser : IdentityUser<int> {

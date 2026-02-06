@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Entities.IdentityEntities;
+using YallaKhadra.Core.Entities.UserEntities;
 
 namespace YallaKhadra.API.DataSeeding {
     public static class UserSeeder {

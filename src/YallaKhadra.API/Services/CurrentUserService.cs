@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Entities;
+using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Enums;
 
 namespace YallaKhadra.API.Services {

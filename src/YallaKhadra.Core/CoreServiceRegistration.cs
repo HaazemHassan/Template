@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using YallaKhadra.Core.Bases;
+using YallaKhadra.Core.Bases.Validations;
 
 namespace YallaKhadra.Core {
     public static class CoreServiceRegistration {

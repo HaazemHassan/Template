@@ -25,7 +25,7 @@ public class SwaggerExcludeOperationFilter : IOperationFilter {
             .Select(prop => prop.Name)
             .ToList();
 
-        if (!parametersToExclude.Any())
+        if (parametersToExclude.Count == 0)
             return;
 
         foreach (var contentType in operation.RequestBody.Content.Values) {

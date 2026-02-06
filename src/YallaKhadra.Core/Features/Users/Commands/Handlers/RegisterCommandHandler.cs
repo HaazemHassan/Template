@@ -5,7 +5,7 @@ using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Bases.Responses;
-using YallaKhadra.Core.Entities;
+using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
 
 namespace YallaKhadra.Core.Features.Users.Commands.Handlers {

@@ -1,6 +1,6 @@
 using YallaKhadra.Core.Enums;
 
-namespace YallaKhadra.Core.Bases;
+namespace YallaKhadra.Core.Bases.Responses;
 
 public class ServiceOperationResult {
     public ServiceOperationStatus Status { get; }

@@ -1,4 +1,4 @@
-﻿namespace YallaKhadra.Core.Entities {
+﻿namespace YallaKhadra.Core.Entities.UserEntities {
     public class DomainUser : BaseEntity<int> {
         public DomainUser() {
         }

@@ -1,5 +1,5 @@
-﻿using YallaKhadra.Core.Bases;
-using YallaKhadra.Core.Bases.Authentication;
+﻿using YallaKhadra.Core.Bases.Authentication;
+using YallaKhadra.Core.Bases.Responses;
 
 namespace YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts {
     public interface IAuthenticationService {

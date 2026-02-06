@@ -7,23 +7,23 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
 using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
-using YallaKhadra.Core.Bases;
 using YallaKhadra.Core.Bases.Authentication;
+using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Entities;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Core.Enums;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
-using YallaKhadra.Infrastructure.Abstracts;
 using YallaKhadra.Infrastructure.Data;
 
-namespace YallaKhadra.Services.Services {
+namespace YallaKhadra.Infrastructure.Services {
     public class AuthenticationService : IAuthenticationService {
 
         private readonly JwtSettings _jwtSettings;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IApplicationUserService _applicationUserService;
         private readonly IMapper _mapper;
         private readonly ICurrentUserService _currentUserService;
@@ -32,10 +32,10 @@ namespace YallaKhadra.Services.Services {
 
 
 
-        public AuthenticationService(JwtSettings jwtSettings, UserManager<ApplicationUser> userManager, IRefreshTokenRepository refreshTokenRepository, IApplicationUserService applicationUserService, IMapper mapper /*IEmailService emailService*/, RoleManager<ApplicationRole> roleManager, ICurrentUserService currentUserService, AppDbContext dbContext) {
+        public AuthenticationService(JwtSettings jwtSettings, UserManager<ApplicationUser> userManager, IUnitOfWork unitOfWork, IApplicationUserService applicationUserService, IMapper mapper /*IEmailService emailService*/, RoleManager<ApplicationRole> roleManager, ICurrentUserService currentUserService, AppDbContext dbContext) {
             _jwtSettings = jwtSettings;
             _userManager = userManager;
-            _refreshTokenRepository = refreshTokenRepository;
+            _unitOfWork = unitOfWork;
             _applicationUserService = applicationUserService;
             _mapper = mapper;
             _roleManager = roleManager;
@@ -77,7 +77,7 @@ namespace YallaKhadra.Services.Services {
             if (appUser is null || appUser.DomainUser is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User is not found");
 
-            var currentRefreshToken = await _refreshTokenRepository.GetAsync(x => x.AccessTokenJTI == jwt.Id &&
+            var currentRefreshToken = await _unitOfWork.RefreshTokens.GetAsync(x => x.AccessTokenJTI == jwt.Id &&
                                                                      x.Token == refreshToken &&
                                                                      x.UserId == appUser.Id);
 
@@ -90,7 +90,7 @@ namespace YallaKhadra.Services.Services {
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Failed, "Failed to generate new token");
 
             currentRefreshToken.RevokationDate = DateTime.UtcNow;
-            await _refreshTokenRepository.UpdateAsync(currentRefreshToken);
+            await _unitOfWork.RefreshTokens.UpdateAsync(currentRefreshToken);
             return jwtResultOperation;
         }
 
@@ -111,7 +111,7 @@ namespace YallaKhadra.Services.Services {
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
 
-            if (!(securityToken is JwtSecurityToken jwtSecurityToken) ||
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
                 !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 return false;
 
@@ -128,13 +128,13 @@ namespace YallaKhadra.Services.Services {
             if (appUser is null)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "User not found!");
 
-            var refreshTokenFromDb = await _refreshTokenRepository.GetAsync(r => r.Token == refreshToken && r.UserId == appUser.Id);
+            var refreshTokenFromDb = await _unitOfWork.RefreshTokens.GetAsync(r => r.Token == refreshToken && r.UserId == appUser.Id);
 
             if (refreshTokenFromDb == null || !refreshTokenFromDb.IsActive)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "You maybe signed out!");
 
             refreshTokenFromDb.RevokationDate = DateTime.UtcNow;
-            await _refreshTokenRepository.UpdateAsync(refreshTokenFromDb);
+            await _unitOfWork.RefreshTokens.UpdateAsync(refreshTokenFromDb);
             return ServiceOperationResult.Success(message: "Logout successfull");
 
         }
@@ -157,7 +157,7 @@ namespace YallaKhadra.Services.Services {
                 Address = appUser.DomainUser.Address!,
                 PhoneNumber = appUser.DomainUser.PhoneNumber!
             };
-            AuthResult jwtResult = new AuthResult(accessToken, refreshToken, userResponse);
+            AuthResult jwtResult = new(accessToken, refreshToken, userResponse);
 
 
             return ServiceOperationResult<AuthResult>.Success(jwtResult, message: "Logged in successfully");
@@ -175,9 +175,9 @@ namespace YallaKhadra.Services.Services {
         private async Task<List<Claim>> GetUserClaims(ApplicationUser user) {
             var claims = new List<Claim>()
              {
-                 new Claim(ClaimTypes.NameIdentifier,user.DomainUserId!.Value.ToString()),
-                 new Claim(ClaimTypes.Email,user.DomainUser!.Email),
-                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                 new(ClaimTypes.NameIdentifier,user.DomainUserId!.Value.ToString()),
+                 new(ClaimTypes.Email,user.DomainUser!.Email),
+                 new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
 
              };
 
@@ -223,9 +223,9 @@ namespace YallaKhadra.Services.Services {
                 Token = refreshTokenDTO.Token,
                 UserId = refreshTokenDTO.UserId
             };
-            await _refreshTokenRepository.AddAsync(refreshToken);
+            await _unitOfWork.RefreshTokens.AddAsync(refreshToken);
         }
-        private JwtSecurityToken ReadJWT(string accessToken) {
+        private static JwtSecurityToken ReadJWT(string accessToken) {
             if (string.IsNullOrEmpty(accessToken)) {
                 throw new ArgumentNullException(nameof(accessToken));
             }
