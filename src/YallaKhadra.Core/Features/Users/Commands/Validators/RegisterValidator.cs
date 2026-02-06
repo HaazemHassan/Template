@@ -10,12 +10,12 @@ namespace YallaKhadra.Core.Features.Users.Commands.Validators {
         }
 
         private void ApplyValidationRules(PasswordSettings passwordSettings) {
-            RuleFor(x => x.FirstName).ApplyNameRules();
-            RuleFor(x => x.LastName).ApplyNameRules();
-            RuleFor(x => x.Email).ApplyEmailRules();
-            RuleFor(x => x.Password).ApplyPasswordRules(passwordSettings);
-            RuleFor(x => x.ConfirmPassword).ApplyConfirmPasswordRules(x => x.Password);
-            RuleFor(x => x.PhoneNumber).ApplyPhoneNumberRules();
+            RuleFor(x => x.FirstName).ApplyNameRules(true);
+            RuleFor(x => x.LastName).ApplyNameRules(true);
+            RuleFor(x => x.Email).ApplyEmailRules(true);
+            RuleFor(x => x.Password).ApplyPasswordRules(passwordSettings, true);
+            RuleFor(x => x.ConfirmPassword).ApplyConfirmPasswordRules(x => x.Password, true);
+            RuleFor(x => x.PhoneNumber).ApplyPhoneNumberRules(true);
         }
     }
 }

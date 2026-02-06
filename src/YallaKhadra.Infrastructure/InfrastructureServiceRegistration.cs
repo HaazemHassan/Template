@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Infrastructure.Data;

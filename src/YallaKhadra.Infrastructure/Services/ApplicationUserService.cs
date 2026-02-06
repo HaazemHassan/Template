@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Core.Entities.UserEntities;

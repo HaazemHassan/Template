@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 
 namespace YallaKhadra.Infrastructure.Repositories {
     public class DataBaseTransaction : IDatabaseTransaction {

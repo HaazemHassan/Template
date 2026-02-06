@@ -1,7 +1,7 @@
 using MediatR;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
-using YallaKhadra.Core.Abstracts.ServicesAbstracts.InfrastrctureServicesAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Authentication.Commands.RequestsModels;
 

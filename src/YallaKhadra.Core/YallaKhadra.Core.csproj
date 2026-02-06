@@ -13,10 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Abstracts\ServicesAbstracts\DomainServicesAbstracts\" />
     <Folder Include="Mapping\Authentication\CommandMapping\" />
     <Folder Include="Mapping\Authentication\QueryMapping\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

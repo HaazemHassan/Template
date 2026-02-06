@@ -1,4 +1,4 @@
-﻿namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+﻿namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 
 public interface IUnitOfWork {
 

@@ -1,7 +1,7 @@
 ﻿using Ardalis.Specification;
 using System.Linq.Expressions;
 
-namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 
 public interface IGenericRepository<T> : IRepositoryBase<T> where T : class {
 

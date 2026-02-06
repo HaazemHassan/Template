@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Enums;
 

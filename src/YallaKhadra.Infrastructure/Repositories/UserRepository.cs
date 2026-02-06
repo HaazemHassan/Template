@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts;
+using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Infrastructure.Data;
 
