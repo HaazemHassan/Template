@@ -2,9 +2,9 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "Hazem",
   "classifications": [ "Web", "Clean Architecture" ],
-  "identity": "Yalla.Reference.Template",
-  "name": "Reference project Template",
-  "shortName": "reference",
+  "identity": "Hazem.API.Template",
+  "name": "My Api project template",
+  "shortName": "ref",
   "sourceName": "YallaKhadra",
   "preferNameDirectory": true,
   "symbols": {},
@@ -13,9 +13,14 @@
       "source": "./",
       "target": "./",
       "exclude": [
-        "**/.vs/**",
         "**/bin/**",
-        "**/obj/**"
+        "**/obj/**",
+        "**/.vs/**",
+        "**/.git/**",
+        "**/.github/**",
+        "**/.template.config/**",
+        "**/*.user",
+        "**/*.lock.json"
       ]
     }
   ]
