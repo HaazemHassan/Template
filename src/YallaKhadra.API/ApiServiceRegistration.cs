@@ -23,10 +23,8 @@ namespace YallaKhadra.API {
         private const string GuestIdKey = "GuestId";   // used for ratelimiting
 
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration) {
-            AddApi(services, configuration);
-
-            //Other Layers Dependency Registrations
             services.AddInfrastructure(configuration);
+            AddApi(services, configuration);
             services.AddCore();
 
             return services;

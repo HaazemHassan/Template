@@ -24,7 +24,6 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
 
         public async Task<Response<UpdateProfileResponse>> Handle(UpdateProfileCommand request, CancellationToken cancellationToken) {
             var userToUpdate = _mapper.Map<UpdateProfileCommand, DomainUser>(request);
-            userToUpdate.Id = _currentUserService.UserId!.Value;
             var updateResult = await _domainUserService.UpdateProfile(userToUpdate, cancellationToken);
 
             if (!updateResult.IsSuccess)
