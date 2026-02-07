@@ -13,7 +13,7 @@ namespace YallaKhadra.Core.Services {
         }
 
         public async Task<ServiceOperationResult<DomainUser>> UpdateProfile(DomainUser user, CancellationToken cancellationToken = default) {
-            var userFromDb = _unitOfWork.Users.GetByIdAsync(user.Id, cancellationToken).Result;
+            var userFromDb = await _unitOfWork.Users.GetByIdAsync(user.Id, cancellationToken);
             if (userFromDb is null)
                 return ServiceOperationResult<DomainUser>.Failure(ServiceOperationStatus.NotFound, "User not found");
 

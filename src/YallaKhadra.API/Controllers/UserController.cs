@@ -7,6 +7,7 @@ using YallaKhadra.Core.Bases.Pagination;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Enums;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
+using YallaKhadra.Core.Features.Users.Commands.Responses;
 using YallaKhadra.Core.Features.Users.Queries.Models;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
 
@@ -63,6 +64,7 @@ namespace YallaKhadra.API.Controllers {
         /// <response code="404">User not found</response>
         /// <response code="400">Invalid user ID format</response>
         [HttpGet("{Id:int}")]
+        [Authorize]
         [ProducesResponseType(typeof(Response<GetUserByIdResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -96,5 +98,28 @@ namespace YallaKhadra.API.Controllers {
             var result = await Mediator.Send(command);
             return NewResult(result);
         }
+
+
+
+        /// <summary>
+        /// Update the authenticated user's profile information
+        /// </summary>
+        /// <param name="command">Updated profile data including address and phone number</param>
+        /// <returns>Success response if profile is updated</returns>
+        /// <response code="200">Profile updated successfully</response>
+        /// <response code="400">Invalid input data</response>
+        /// <response code="401">User not authenticated</response>
+        /// <response code="404">User not found</response>
+        [HttpPatch("profile")]
+        [Authorize]
+        [ProducesResponseType(typeof(Response<UpdateProfileResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileCommand command) {
+            var result = await Mediator.Send(command);
+            return NewResult(result);
+        }
+
     }
 }

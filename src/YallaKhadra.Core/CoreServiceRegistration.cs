@@ -2,7 +2,9 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using YallaKhadra.Core.Abstracts.CoreAbstracts.Services;
 using YallaKhadra.Core.Bases.Validations;
+using YallaKhadra.Core.Services;
 
 namespace YallaKhadra.Core {
     public static class CoreServiceRegistration {
@@ -13,6 +15,14 @@ namespace YallaKhadra.Core {
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+            AddDomainServices(services);
+
+            return services;
+        }
+
+
+        public static IServiceCollection AddDomainServices(IServiceCollection services) {
+            services.AddScoped<IDomainUserService, DomainUserService>();
             return services;
         }
     }

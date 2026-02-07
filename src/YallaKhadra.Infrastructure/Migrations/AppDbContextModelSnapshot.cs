@@ -261,10 +261,10 @@ namespace YallaKhadra.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken", (string)null);
+                    b.ToTable("RefreshToken");
                 });
 
-            modelBuilder.Entity("YallaKhadra.Core.Entities.User", b =>
+            modelBuilder.Entity("YallaKhadra.Core.Entities.UserEntities.DomainUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -286,6 +286,9 @@ namespace YallaKhadra.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -296,7 +299,7 @@ namespace YallaKhadra.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("DomainUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -352,7 +355,7 @@ namespace YallaKhadra.Infrastructure.Migrations
 
             modelBuilder.Entity("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", b =>
                 {
-                    b.HasOne("YallaKhadra.Core.Entities.User", "DomainUser")
+                    b.HasOne("YallaKhadra.Core.Entities.UserEntities.DomainUser", "DomainUser")
                         .WithOne()
                         .HasForeignKey("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", "DomainUserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -362,13 +365,11 @@ namespace YallaKhadra.Infrastructure.Migrations
 
             modelBuilder.Entity("YallaKhadra.Core.Entities.RefreshToken", b =>
                 {
-                    b.HasOne("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", "User")
+                    b.HasOne("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", null)
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("YallaKhadra.Core.Entities.IdentityEntities.ApplicationUser", b =>

@@ -1,6 +1,5 @@
 using AutoMapper;
 using MediatR;
-using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Authentication;
@@ -27,15 +26,16 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
             var userMapped = _mapper.Map<DomainUser>(request);
             var addUserResult = await _applicationUserService.AddUser(userMapped, request.Password);
 
-            if (!addUserResult.IsSuccess || addUserResult.Data is null)
+            if (!addUserResult.IsSuccess)
                 return FromServiceResult<AuthResult>(addUserResult);
 
             var user = addUserResult.Data;
 
             var authResult = await _authenticationService.SignInWithPassword(user.Email, request.Password);
-            if (!addUserResult.IsSuccess)
+            if (!authResult.IsSuccess)
                 FromServiceResult(authResult);
 
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             return FromServiceResult(authResult);
         }

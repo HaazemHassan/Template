@@ -22,7 +22,9 @@ namespace YallaKhadra.Infrastructure.Services {
             _userManager = userManager;
         }
 
-        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole role = UserRole.User) {
+        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole? role = null) {
+            if (role is null)
+                role = UserRole.User;
             if (_currentUserService.IsAuthenticated && !_currentUserService.IsInRole(UserRole.Admin))
                 return ServiceOperationResult<DomainUser>.Failure(ServiceOperationStatus.Forbidden);
             else if (!_currentUserService.IsAuthenticated)
