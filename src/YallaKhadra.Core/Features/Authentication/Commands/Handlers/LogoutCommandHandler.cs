@@ -18,7 +18,7 @@ public class LogoutCommandHandler : ResponseHandler, IRequestHandler<LogoutComma
 
     public async Task<Response> Handle(LogoutCommand request, CancellationToken cancellationToken) {
         var serviceResult = await _authenticationService.LogoutAsync(request.RefreshToken!);
-        if (serviceResult.IsSuccess)
+        if (serviceResult.Succeeded)
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         return FromServiceResult(serviceResult);
     }

@@ -16,17 +16,17 @@ namespace YallaKhadra.Infrastructure.Repositories {
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate) {
-            return await _dbContext.Set<T>().FirstOrDefaultAsync(predicate);
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) {
+            return await _dbContext.Set<T>().FirstOrDefaultAsync(predicate, cancellationToken);
         }
-        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate) {
-            return await _dbContext.Set<T>().AnyAsync(predicate);
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default) {
+            return await _dbContext.Set<T>().AnyAsync(predicate, cancellationToken);
         }
 
-        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate) {
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate, CancellationToken cancellationToken = default) {
             if (predicate is not null)
-                return await _dbContext.Set<T>().CountAsync(predicate);
-            return await _dbContext.Set<T>().CountAsync();
+                return await _dbContext.Set<T>().CountAsync(predicate, cancellationToken);
+            return await _dbContext.Set<T>().CountAsync(cancellationToken);
         }
     }
 }

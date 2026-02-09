@@ -44,9 +44,9 @@ namespace YallaKhadra.Infrastructure.Services {
             //_emailService = emailService;
         }
 
-        public async Task<ServiceOperationResult<AuthResult>> SignInWithPassword(string email, string passwod) {
+        public async Task<ServiceOperationResult<AuthResult>> SignInWithPassword(string email, string passwod, CancellationToken ct = default) {
             var userFromDb = await _dbContext.Set<ApplicationUser>().Include(u => u.RefreshTokens).Include(u => u.DomainUser)
-                                .FirstOrDefaultAsync(u => u.Email == email && u.DomainUser!.Email == email);
+                                .FirstOrDefaultAsync(u => u.Email == email && u.DomainUser!.Email == email, cancellationToken: ct);
             if (userFromDb is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Invalid Email or password");
 
@@ -60,7 +60,7 @@ namespace YallaKhadra.Infrastructure.Services {
             return await AuthenticateAsync(userFromDb);
         }
 
-        public async Task<ServiceOperationResult<AuthResult>> ReAuthenticateAsync(string refreshToken, string accessToken) {
+        public async Task<ServiceOperationResult<AuthResult>> ReAuthenticateAsync(string refreshToken, string accessToken, CancellationToken ct = default) {
             var isValidAccessToken = ValidateAccessToken(accessToken, validateLifetime: false);
             if (!isValidAccessToken)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Invalid access token");
@@ -73,24 +73,24 @@ namespace YallaKhadra.Infrastructure.Services {
             if (domainUserId is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User id is null");
 
-            var appUser = await _dbContext.Set<ApplicationUser>().Include(au => au.DomainUser).FirstOrDefaultAsync(au => au.DomainUserId.ToString() == domainUserId);
+            var appUser = await _dbContext.Set<ApplicationUser>().Include(au => au.DomainUser).FirstOrDefaultAsync(au => au.DomainUserId.ToString() == domainUserId, cancellationToken: ct);
             if (appUser is null || appUser.DomainUser is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User is not found");
 
             var currentRefreshToken = await _unitOfWork.RefreshTokens.GetAsync(x => x.AccessTokenJTI == jwt.Id &&
                                                                      x.Token == refreshToken &&
-                                                                     x.UserId == appUser.Id);
+                                                                     x.UserId == appUser.Id, ct);
 
             if (currentRefreshToken is null || !currentRefreshToken.IsActive)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Refresh token is not valid");
 
             //new jwt result
             var jwtResultOperation = await AuthenticateAsync(appUser, currentRefreshToken.Expires);
-            if (!jwtResultOperation.IsSuccess || jwtResultOperation.Data is null)
+            if (!jwtResultOperation.Succeeded || jwtResultOperation.Data is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Failed, "Failed to generate new token");
 
             currentRefreshToken.RevokationDate = DateTime.UtcNow;
-            await _unitOfWork.RefreshTokens.UpdateAsync(currentRefreshToken);
+            await _unitOfWork.RefreshTokens.UpdateAsync(currentRefreshToken, ct);
             return jwtResultOperation;
         }
 
@@ -119,25 +119,43 @@ namespace YallaKhadra.Infrastructure.Services {
         }
 
 
-        public async Task<ServiceOperationResult> LogoutAsync(string refreshToken) {
+        public async Task<ServiceOperationResult> LogoutAsync(string refreshToken, CancellationToken ct = default) {
             if (!_currentUserService.IsAuthenticated)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.Unauthorized, "You're already signed out!");
 
             int domainUserId = _currentUserService.UserId!.Value;
-            var appUser = await _userManager.Users.FirstOrDefaultAsync(au => au.DomainUserId == domainUserId);
+            var appUser = await _userManager.Users.FirstOrDefaultAsync(au => au.DomainUserId == domainUserId, cancellationToken: ct);
             if (appUser is null)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "User not found!");
 
-            var refreshTokenFromDb = await _unitOfWork.RefreshTokens.GetAsync(r => r.Token == refreshToken && r.UserId == appUser.Id);
+            var refreshTokenFromDb = await _unitOfWork.RefreshTokens.GetAsync(r => r.Token == refreshToken && r.UserId == appUser.Id, ct);
 
             if (refreshTokenFromDb == null || !refreshTokenFromDb.IsActive)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "You maybe signed out!");
 
             refreshTokenFromDb.RevokationDate = DateTime.UtcNow;
-            await _unitOfWork.RefreshTokens.UpdateAsync(refreshTokenFromDb);
+            await _unitOfWork.RefreshTokens.UpdateAsync(refreshTokenFromDb, ct);
             return ServiceOperationResult.Success(message: "Logout successfull");
 
         }
+
+
+        public async Task<ServiceOperationResult> ChangePassword(int domainUserId, string currentPassword, string newPassword) {
+            var appUser = await _userManager.Users.FirstOrDefaultAsync(au => au.DomainUserId == domainUserId);
+            if (appUser is null)
+                return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "User not found.");
+
+            var result = await _userManager.ChangePasswordAsync(appUser, currentPassword, newPassword);
+
+            if (!result.Succeeded)
+                return ServiceOperationResult.Failure(ServiceOperationStatus.Unauthorized, result.Errors.FirstOrDefault()?.Description);
+
+            return ServiceOperationResult.Success(ServiceOperationStatus.Updated);
+
+
+        }
+
+
 
         #region Helper functions
 
@@ -233,7 +251,6 @@ namespace YallaKhadra.Infrastructure.Services {
             var response = handler.ReadJwtToken(accessToken);
             return response;
         }
-
 
         #endregion
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Entities.IdentityEntities;
 using YallaKhadra.Core.Entities.UserEntities;
@@ -22,7 +21,7 @@ namespace YallaKhadra.Infrastructure.Services {
             _userManager = userManager;
         }
 
-        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole? role = null) {
+        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole? role = null, CancellationToken ct = default) {
             if (role is null)
                 role = UserRole.User;
             if (_currentUserService.IsAuthenticated && !_currentUserService.IsInRole(UserRole.Admin))
@@ -30,11 +29,11 @@ namespace YallaKhadra.Infrastructure.Services {
             else if (!_currentUserService.IsAuthenticated)
                 role = UserRole.User;
 
-            if (await _unitOfWork.Users.AnyAsync(x => x.Email == user.Email))
+            if (await _unitOfWork.Users.AnyAsync(x => x.Email == user.Email, ct))
                 return ServiceOperationResult<DomainUser>.
                     Failure(ServiceOperationStatus.AlreadyExists, "Email already exists.");
 
-            if (await _unitOfWork.Users.AnyAsync(x => x.PhoneNumber == user.PhoneNumber))
+            if (await _unitOfWork.Users.AnyAsync(x => x.PhoneNumber == user.PhoneNumber, ct))
                 return ServiceOperationResult<DomainUser>.
                     Failure(ServiceOperationStatus.AlreadyExists, "This phone number is used.");
 
@@ -51,7 +50,7 @@ namespace YallaKhadra.Infrastructure.Services {
                 return ServiceOperationResult<DomainUser>.
                     Failure(ServiceOperationStatus.Failed, "Failed to create user. Please try again later.");
 
-            var addToRoleResult = await _userManager.AddToRoleAsync(applicationUser, role.ToString());
+            var addToRoleResult = await _userManager.AddToRoleAsync(applicationUser, role.ToString()!);
             if (!addToRoleResult.Succeeded)
                 return ServiceOperationResult<DomainUser>.
                     Failure(ServiceOperationStatus.Failed, "Failed to create user. Please try again later.");
@@ -64,5 +63,7 @@ namespace YallaKhadra.Infrastructure.Services {
             return ServiceOperationResult<DomainUser>.
                 Success(user, ServiceOperationStatus.Created);
         }
+
+
     }
 }

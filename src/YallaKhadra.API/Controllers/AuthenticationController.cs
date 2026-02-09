@@ -7,6 +7,7 @@ using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Authentication.Commands.RequestsModels;
+using YallaKhadra.Core.Features.Users.Commands.RequestModels;
 
 namespace YallaKhadra.API.Controllers {
 
@@ -92,6 +93,15 @@ namespace YallaKhadra.API.Controllers {
 
             return NewResult(result);
         }
+
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordCommand command) {
+            var result = await Mediator.Send(command);
+            return NewResult(result);
+        }
+
+
 
 
         //helpers

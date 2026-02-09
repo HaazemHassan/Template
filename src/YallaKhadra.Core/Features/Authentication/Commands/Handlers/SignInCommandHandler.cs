@@ -18,7 +18,7 @@ public class SignInCommandHandler : ResponseHandler, IRequestHandler<SignInComma
 
     public async Task<Response<AuthResult>> Handle(SignInCommand request, CancellationToken cancellationToken) {
         var authResult = await _authenticationService.SignInWithPassword(request.Email, request.Password);
-        if (authResult.IsSuccess)
+        if (authResult.Succeeded)
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         return FromServiceResult(authResult);
     }

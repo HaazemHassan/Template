@@ -1,7 +1,6 @@
 using AutoMapper;
 using MediatR;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Services;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
@@ -23,9 +22,9 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
         public async Task<Response<AddUserResponse>> Handle(AddUserCommand request, CancellationToken cancellationToken) {
             await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var domainUser = _mapper.Map<DomainUser>(request);
-            var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, request.UserRole);
+            var addUserResult = await _applicationUserService.AddUser(domainUser, request.Password, request.UserRole, cancellationToken);
 
-            if (!addUserResult.IsSuccess)
+            if (!addUserResult.Succeeded)
                 return FromServiceResult<AddUserResponse>(addUserResult);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

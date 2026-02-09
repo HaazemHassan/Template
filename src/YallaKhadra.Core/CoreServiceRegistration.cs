@@ -12,19 +12,23 @@ namespace YallaKhadra.Core {
 
             services.AddAutoMapper(cfg => { }, Assembly.GetExecutingAssembly());
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrimmingBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+            AddBehaviours(services);
             AddDomainServices(services);
 
             return services;
         }
 
 
-        public static IServiceCollection AddDomainServices(IServiceCollection services) {
+
+        public static void AddBehaviours(IServiceCollection services) {
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrimmingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+        }
+
+        public static void AddDomainServices(IServiceCollection services) {
             services.AddScoped<IDomainUserService, DomainUserService>();
-            return services;
         }
     }
 }

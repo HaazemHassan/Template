@@ -32,7 +32,7 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
             _mapper.Map(request, userFromDb);
             var updateResult = await _domainUserService.UpdateProfile(userFromDb, cancellationToken);
 
-            if (!updateResult.IsSuccess)
+            if (!updateResult.Succeeded)
                 return FromServiceResult<UpdateProfileResponse>(updateResult);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

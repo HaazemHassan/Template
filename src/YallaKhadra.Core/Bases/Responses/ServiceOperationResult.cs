@@ -8,7 +8,7 @@ public class ServiceOperationResult {
     public string? ErrorCode { get; }
     public object? Meta { get; }
 
-    public bool IsSuccess => IsSuccessStatus(Status);
+    public bool Succeeded => IsSuccessStatus(Status);
 
     protected ServiceOperationResult(
         ServiceOperationStatus status,
