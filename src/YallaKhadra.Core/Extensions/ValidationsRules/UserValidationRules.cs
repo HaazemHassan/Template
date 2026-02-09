@@ -4,8 +4,8 @@ using YallaKhadra.Core.Bases.Authentication;
 
 namespace YallaKhadra.Core.Extensions.Validations {
     public static class UserValidationRules {
-        public static IRuleBuilderOptions<T, string> ApplyNameRules<T>(
-            this IRuleBuilder<T, string> ruleBuilder,
+        public static IRuleBuilderOptions<T, string?> ApplyNameRules<T>(
+            this IRuleBuilder<T, string?> ruleBuilder,
             bool isRequired = false,
             int minLength = 3,
             int maxLength = 15
@@ -27,7 +27,7 @@ namespace YallaKhadra.Core.Extensions.Validations {
         }
 
 
-        public static IRuleBuilderOptions<T, string> ApplyEmailRules<T>(
+        public static IRuleBuilderOptions<T, string?> ApplyEmailRules<T>(
             this IRuleBuilder<T, string> ruleBuilder,
             bool isRequired = false
         ) {
@@ -46,7 +46,7 @@ namespace YallaKhadra.Core.Extensions.Validations {
         }
 
 
-        public static IRuleBuilderOptions<T, string> ApplyPasswordRules<T>(
+        public static IRuleBuilderOptions<T, string?> ApplyPasswordRules<T>(
              this IRuleBuilder<T, string> ruleBuilder,
              PasswordSettings settings,
              bool isRequired = false
@@ -98,13 +98,13 @@ namespace YallaKhadra.Core.Extensions.Validations {
             }
 
             return rule
-                .Must(phone => string.IsNullOrWhiteSpace(phone) || Regex.IsMatch(phone, @"^\+?[1-9]\d{1,14}$"))
+                .Must(phone => string.IsNullOrWhiteSpace(phone) || Regex.IsMatch(phone, @"^(\+20|0)(10|11|12|15)[0-9]{8}$"))
                     .WithMessage("Phone number is not valid");
         }
 
 
-        public static IRuleBuilderOptions<T, string> ApplyAddressRules<T>(
-            this IRuleBuilder<T, string> ruleBuilder,
+        public static IRuleBuilderOptions<T, string?> ApplyAddressRules<T>(
+            this IRuleBuilder<T, string?> ruleBuilder,
             bool isRequired = false,
             int maxLength = 200
         ) {
@@ -121,8 +121,8 @@ namespace YallaKhadra.Core.Extensions.Validations {
         }
 
 
-        public static IRuleBuilderOptions<T, string> ApplyConfirmPasswordRules<T>(
-            this IRuleBuilder<T, string> ruleBuilder,
+        public static IRuleBuilderOptions<T, string?> ApplyConfirmPasswordRules<T>(
+            this IRuleBuilder<T, string?> ruleBuilder,
             Func<T, string> passwordSelector,
             bool isRequired = true
         ) {

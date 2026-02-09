@@ -23,8 +23,14 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
         }
 
         public async Task<Response<UpdateProfileResponse>> Handle(UpdateProfileCommand request, CancellationToken cancellationToken) {
-            var userToUpdate = _mapper.Map<UpdateProfileCommand, DomainUser>(request);
-            var updateResult = await _domainUserService.UpdateProfile(userToUpdate, cancellationToken);
+            var userId = _currentUserService.UserId;
+
+            var userFromDb = await _unitOfWork.Users.GetByIdAsync(userId!.Value, cancellationToken);
+            if (userFromDb is null)
+                return NotFound<UpdateProfileResponse>("User not found");
+
+            _mapper.Map(request, userFromDb);
+            var updateResult = await _domainUserService.UpdateProfile(userFromDb, cancellationToken);
 
             if (!updateResult.IsSuccess)
                 return FromServiceResult<UpdateProfileResponse>(updateResult);
@@ -32,7 +38,7 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             var userResponse = _mapper.Map<DomainUser, UpdateProfileResponse>(updateResult.Data);
-            return FromServiceResult<UpdateProfileResponse>(updateResult);
+            return Updated(userResponse);
         }
 
     }

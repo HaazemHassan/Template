@@ -9,6 +9,10 @@ namespace YallaKhadra.API {
             var builder = WebApplication.CreateBuilder(args);
 
 
+            //builder.Services.AddControllers().AddJsonOptions(options => {
+            //    options.JsonSerializerOptions.Converters.Add(new TrimmingJsonConverter());
+            //});
+
             builder.Services.AddControllers();
             builder.Services.AddServices(builder.Configuration);
 

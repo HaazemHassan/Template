@@ -1,5 +1,4 @@
 using MediatR;
-using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Users.Queries.Models;
@@ -14,7 +13,7 @@ namespace YallaKhadra.Core.Features.Users.Queries.Handlers {
         }
 
         public async Task<Response<CheckEmailAvailabilityResponse>> Handle(CheckEmailAvailabilityQuery request, CancellationToken cancellationToken) {
-            var user = await _unitOfWork.Users.GetAsync(u => u.Email == request.Email);
+            var user = await _unitOfWork.Users.GetAsync(u => u.Email == request.Email, cancellationToken);
             var response = new CheckEmailAvailabilityResponse {
                 IsAvailable = user is null
             };
