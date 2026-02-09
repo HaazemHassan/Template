@@ -29,7 +29,13 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
             if (userFromDb is null)
                 return NotFound<UpdateProfileResponse>("User not found");
 
-            _mapper.Map(request, userFromDb);
+            userFromDb.UpdateInfo(
+                firstName: request.FirstName,
+                lastName: request.LastName,
+                phoneNumber: request.PhoneNumber,
+                address: request.Address
+            );
+
             var updateResult = await _domainUserService.UpdateProfile(userFromDb, cancellationToken);
 
             if (!updateResult.Succeeded)

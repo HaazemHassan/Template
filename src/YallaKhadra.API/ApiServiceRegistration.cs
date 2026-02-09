@@ -96,7 +96,7 @@ namespace YallaKhadra.API {
         private static IServiceCollection AddAuthenticationConfigurations(IServiceCollection services, IConfiguration configuration) {
             //JWT Authentication
             var jwtSettings = new JwtSettings();
-            configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
+            configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
             services.AddSingleton(jwtSettings);
 
 
@@ -142,7 +142,7 @@ namespace YallaKhadra.API {
          this IServiceCollection services, IConfiguration configuration) {
 
             var rateLimitingSettings = new RateLimitingSettings();
-            configuration.GetSection(nameof(RateLimitingSettings)).Bind(rateLimitingSettings);
+            configuration.GetSection(RateLimitingSettings.SectionName).Bind(rateLimitingSettings);
             services.AddSingleton(rateLimitingSettings);
 
             services.AddRateLimiter(options => {

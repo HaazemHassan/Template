@@ -227,7 +227,6 @@ namespace YallaKhadra.Infrastructure.Services {
             return new RefreshTokenDTO {
                 Token = refreshTokenValue,
                 ExpirationDate = expirationDate ?? DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationDays),
-                CreatedAt = DateTime.UtcNow,
                 UserId = userId
             };
 
@@ -235,7 +234,6 @@ namespace YallaKhadra.Infrastructure.Services {
         }
         private async Task AddRefreshTokenToDatabase(RefreshTokenDTO refreshTokenDTO, string accessTokenJti) {
             var refreshToken = new RefreshToken {
-                Created = DateTime.UtcNow,
                 Expires = refreshTokenDTO.ExpirationDate,
                 AccessTokenJTI = accessTokenJti,
                 Token = refreshTokenDTO.Token,

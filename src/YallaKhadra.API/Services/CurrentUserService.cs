@@ -1,17 +1,13 @@
 using System.Security.Claims;
 using YallaKhadra.Core.Abstracts.ApiAbstracts;
-using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
-using YallaKhadra.Core.Entities.UserEntities;
 using YallaKhadra.Core.Enums;
 
 namespace YallaKhadra.API.Services {
     public class CurrentUserService : ICurrentUserService {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUserRepository _userRepository;
 
-        public CurrentUserService(IHttpContextAccessor httpContextAccessor, IUserRepository userRepository) {
+        public CurrentUserService(IHttpContextAccessor httpContextAccessor) {
             _httpContextAccessor = httpContextAccessor;
-            _userRepository = userRepository;
         }
 
         public int? UserId {
@@ -25,13 +21,6 @@ namespace YallaKhadra.API.Services {
             _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
 
         public bool IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
-
-
-        public async Task<DomainUser?> GetCurrentUserAsync() {
-            if (!IsAuthenticated || UserId == null)
-                return null;
-            return await _userRepository.GetByIdAsync(UserId.Value);
-        }
 
         public IList<UserRole> GetRoles() {
             if (!IsAuthenticated)

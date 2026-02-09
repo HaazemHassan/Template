@@ -1,5 +1,7 @@
 namespace YallaKhadra.API.RateLimiting {
     public class RateLimitingSettings {
+        public const string SectionName = "RateLimitingSettings";
+
         public DefaultLimiterSettings DefaultLimiter { get; set; } = new();
         public LoginLimiterSettings LoginLimiter { get; set; } = new();
         public int RetryAfterSeconds { get; set; }

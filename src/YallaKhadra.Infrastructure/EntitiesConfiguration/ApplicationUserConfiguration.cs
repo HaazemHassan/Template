@@ -7,7 +7,6 @@ namespace YallaKhadra.Infrastructure.EntitiesConfiguration {
         public void Configure(EntityTypeBuilder<ApplicationUser> builder) {
             builder.ToTable("AspNetUsers", schema: "identity");
 
-
             builder.HasMany(u => u.RefreshTokens)
                    .WithOne()
                    .HasForeignKey(rt => rt.UserId)
@@ -17,6 +16,8 @@ namespace YallaKhadra.Infrastructure.EntitiesConfiguration {
                     .WithOne()
                     .HasForeignKey<ApplicationUser>(a => a.DomainUserId)
                     .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(u => u.DomainUserId).IsUnique();
 
         }
     }

@@ -1,6 +1,6 @@
 ﻿namespace YallaKhadra.Core.Entities {
-    public class BaseEntity<T> {
-        public T Id { get; set; }
+    public abstract class BaseEntity<TId> {
+        public TId Id { get; set; }
 
     }
 }

@@ -1,5 +1,6 @@
-﻿namespace YallaKhadra.Core.Entities.UserEntities {
-    public class DomainUser : BaseEntity<int> {
+﻿
+namespace YallaKhadra.Core.Entities.UserEntities {
+    public class DomainUser : FullAuditableEntity<int> {
         public DomainUser() {
         }
         public string FirstName { get; set; } = string.Empty;
@@ -7,8 +8,24 @@
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string? Address { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public bool IsDeleted { get; set; } = false;
+
+        public string FullName => $"{FirstName} {LastName}";
+
+
+
+        public void UpdateInfo(string? firstName = null, string? lastName = null, string? phoneNumber = null, string? address = null) {
+            if (!string.IsNullOrWhiteSpace(firstName))
+                FirstName = firstName;
+
+            if (!string.IsNullOrWhiteSpace(lastName))
+                LastName = lastName;
+
+            if (!string.IsNullOrWhiteSpace(phoneNumber))
+                PhoneNumber = phoneNumber;
+
+            if (!string.IsNullOrWhiteSpace(address))
+                Address = address;
+        }
 
     }
 }

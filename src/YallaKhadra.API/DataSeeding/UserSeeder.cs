@@ -23,8 +23,7 @@ namespace YallaKhadra.API.DataSeeding {
                     LastName = data.LastName,
                     Email = data.Email,
                     PhoneNumber = data.PhoneNumber,
-                    Address = data.Address,
-                    CreatedAt = DateTime.UtcNow
+                    Address = data.Address
                 };
 
                 var applicationUser = new ApplicationUser {
