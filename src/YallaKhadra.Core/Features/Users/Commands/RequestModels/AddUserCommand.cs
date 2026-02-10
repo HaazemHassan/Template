@@ -12,6 +12,6 @@ namespace YallaKhadra.Core.Features.Users.Commands.RequestModels {
         public string ConfirmPassword { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
-        public UserRole? UserRole { get; set; } = Enums.UserRole.User;
+        public UserRole UserRole { get; set; } = UserRole.User;
     }
 }

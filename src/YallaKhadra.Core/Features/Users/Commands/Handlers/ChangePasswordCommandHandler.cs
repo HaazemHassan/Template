@@ -24,8 +24,6 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
         public async Task<Response> Handle(ChangePasswordCommand request, CancellationToken cancellationToken) {
             var userId = _currentUserService.UserId;
             var changeResult = await _authenticationService.ChangePassword(userId!.Value, request.CurrentPassword, request.NewPassword);
-            if (changeResult.Succeeded)
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
             return FromServiceResult(changeResult);
 
         }

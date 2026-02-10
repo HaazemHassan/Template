@@ -27,5 +27,15 @@ namespace YallaKhadra.Core.Entities.UserEntities {
                 Address = address;
         }
 
+
+        public static DomainUser Create(string firstName, string lastName, string email, string phoneNumber, string? address = null) {
+            return new DomainUser {
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PhoneNumber = phoneNumber,
+                Address = address
+            };
+        }
     }
 }

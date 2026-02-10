@@ -17,7 +17,6 @@ public class RefreshTokenCommandHandler : ResponseHandler, IRequestHandler<Refre
     }
 
     public async Task<Response<AuthResult>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken) {
-        await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
         var authResult = await _authenticationService.ReAuthenticateAsync(request.RefreshToken!, request.AccessToken);
         if (authResult.Succeeded)
             await _unitOfWork.SaveChangesAsync(cancellationToken);

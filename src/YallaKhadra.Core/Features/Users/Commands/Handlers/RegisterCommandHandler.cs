@@ -22,7 +22,6 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
         }
 
         public async Task<Response<AuthResult>> Handle(RegisterCommand request, CancellationToken cancellationToken) {
-            await using var transaction = await _unitOfWork.BeginTransactionAsync(cancellationToken);
             var userMapped = _mapper.Map<DomainUser>(request);
             var addUserResult = await _applicationUserService.AddUser(userMapped, request.Password, ct: cancellationToken);
 
@@ -33,10 +32,9 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
 
             var authResult = await _authenticationService.SignInWithPassword(user.Email, request.Password, cancellationToken);
             if (!authResult.Succeeded)
-                FromServiceResult(authResult);
+                return FromServiceResult(authResult);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
             return FromServiceResult(authResult);
         }
     }

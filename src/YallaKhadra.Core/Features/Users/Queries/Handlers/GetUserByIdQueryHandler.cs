@@ -1,10 +1,10 @@
 using AutoMapper;
 using MediatR;
-using YallaKhadra.Core.Abstracts.ApiAbstracts;
 using YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories;
 using YallaKhadra.Core.Bases.Responses;
 using YallaKhadra.Core.Features.Users.Queries.Models;
 using YallaKhadra.Core.Features.Users.Queries.Responses;
+using YallaKhadra.Core.Features.Users.Queries.Specefications;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Handlers {
     public class GetUserByIdQueryHandler : ResponseHandler, IRequestHandler<GetUserByIdQuery, Response<GetUserByIdResponse>> {
@@ -17,7 +17,8 @@ namespace YallaKhadra.Core.Features.Users.Queries.Handlers {
         }
 
         public async Task<Response<GetUserByIdResponse>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken) {
-            var user = await _unitOfWork.Users.GetByIdAsync(request.Id);
+            var spec = new UserDetailsProjectionSpec(request.Id);
+            var user = await _unitOfWork.Users.FirstOrDefaultAsync(spec);
             if (user is null)
                 return NotFound<GetUserByIdResponse>();
 

@@ -9,9 +9,12 @@ namespace YallaKhadra.Core.Features.Authentication.Commands.Validators {
 
         private void ApplyValidationRules() {
             RuleFor(x => x.AccessToken)
-                .NotEmpty().WithMessage("Access token is required")
-                .NotNull().WithMessage("Access token cannot be null")
-                .MinimumLength(10).WithMessage("Access token is invalid");
+                .NotEmpty().WithMessage("Access token is required");
+
+            When(x => !string.IsNullOrWhiteSpace(x.AccessToken), () => {
+                RuleFor(x => x.AccessToken)
+                    .MinimumLength(10).WithMessage("Access token is invalid");
+            });
         }
     }
 }

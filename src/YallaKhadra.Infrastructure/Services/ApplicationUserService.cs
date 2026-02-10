@@ -21,10 +21,9 @@ namespace YallaKhadra.Infrastructure.Services {
             _userManager = userManager;
         }
 
-        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole? role = null, CancellationToken ct = default) {
-            if (role is null)
-                role = UserRole.User;
-            if (_currentUserService.IsAuthenticated && !_currentUserService.IsInRole(UserRole.Admin))
+        public async Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole role = UserRole.User, CancellationToken ct = default) {
+
+            if (!_currentUserService.IsInRole(UserRole.Admin))
                 return ServiceOperationResult<DomainUser>.Failure(ServiceOperationStatus.Forbidden);
             else if (!_currentUserService.IsAuthenticated)
                 role = UserRole.User;
@@ -37,12 +36,9 @@ namespace YallaKhadra.Infrastructure.Services {
                 return ServiceOperationResult<DomainUser>.
                     Failure(ServiceOperationStatus.AlreadyExists, "This phone number is used.");
 
-            var applicationUser = new ApplicationUser {
-                UserName = user.Email,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                DomainUser = user
-            };
+
+            var applicationUser = ApplicationUser.Create(user.Email, user.PhoneNumber);
+            applicationUser.AssignDomainUser(user);
 
             var createResult = await _userManager.CreateAsync(applicationUser, password);
 

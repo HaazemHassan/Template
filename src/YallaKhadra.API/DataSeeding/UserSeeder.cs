@@ -18,26 +18,18 @@ namespace YallaKhadra.API.DataSeeding {
                 return;
 
             foreach (var data in seedData) {
-                var domainUser = new DomainUser {
-                    FirstName = data.FirstName,
-                    LastName = data.LastName,
-                    Email = data.Email,
-                    PhoneNumber = data.PhoneNumber,
-                    Address = data.Address
-                };
 
-                var applicationUser = new ApplicationUser {
-                    UserName = data.Email,
-                    Email = data.Email,
-                    PhoneNumber = data.PhoneNumber,
-                    EmailConfirmed = true,
-                    DomainUser = domainUser
-                };
+                var domainUser = DomainUser.Create(data.FirstName, data.LastName, data.Email, data.PhoneNumber, data.Address);
 
-                var result = await userManager.CreateAsync(applicationUser, data.Password ?? "P@ssw0rd");
+                var applicationUser = ApplicationUser.Create(data.Email, data.PhoneNumber);
+                applicationUser.AssignDomainUser(domainUser);
+                applicationUser.ConfirmEmail();
+
+
+                var result = await userManager.CreateAsync(applicationUser, data.Password!);
 
                 if (result.Succeeded) {
-                    await userManager.AddToRoleAsync(applicationUser, data.Role ?? "User");
+                    await userManager.AddToRoleAsync(applicationUser, data.Role!);
                 }
             }
         }

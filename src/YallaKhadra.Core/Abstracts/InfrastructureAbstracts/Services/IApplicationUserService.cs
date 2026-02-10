@@ -4,7 +4,7 @@ using YallaKhadra.Core.Enums;
 
 namespace YallaKhadra.Core.Abstracts.InfrastructureAbstracts.Repositories {
     public interface IApplicationUserService {
-        public Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole? role = null, CancellationToken ct = default);
+        public Task<ServiceOperationResult<DomainUser>> AddUser(DomainUser user, string password, UserRole role = UserRole.User, CancellationToken ct = default);
 
 
     }

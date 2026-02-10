@@ -20,6 +20,7 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
             _mapper = mapper;
             _domainUserService = domainUserService;
             _currentUserService = currentUserService;
+
         }
 
         public async Task<Response<UpdateProfileResponse>> Handle(UpdateProfileCommand request, CancellationToken cancellationToken) {
@@ -36,14 +37,10 @@ namespace YallaKhadra.Core.Features.Users.Commands.Handlers {
                 address: request.Address
             );
 
-            var updateResult = await _domainUserService.UpdateProfile(userFromDb, cancellationToken);
-
-            if (!updateResult.Succeeded)
-                return FromServiceResult<UpdateProfileResponse>(updateResult);
-
+            await _unitOfWork.Users.UpdateAsync(userFromDb, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            var userResponse = _mapper.Map<DomainUser, UpdateProfileResponse>(updateResult.Data);
+            var userResponse = _mapper.Map<DomainUser, UpdateProfileResponse>(userFromDb);
             return Updated(userResponse);
         }
 

@@ -2,6 +2,7 @@
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Extensions.Validations;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
+using YallaKhadra.Core.ValidationsRules.Common;
 
 namespace YallaKhadra.Core.Features.Users.Commands.Validators {
     public class RegisterValidator : AbstractValidator<RegisterCommand> {
@@ -10,12 +11,48 @@ namespace YallaKhadra.Core.Features.Users.Commands.Validators {
         }
 
         private void ApplyValidationRules(PasswordSettings passwordSettings) {
-            RuleFor(x => x.FirstName).ApplyNameRules(true);
-            RuleFor(x => x.LastName).ApplyNameRules(true);
-            RuleFor(x => x.Email).ApplyEmailRules(true);
-            RuleFor(x => x.Password).ApplyPasswordRules(passwordSettings, true);
-            RuleFor(x => x.ConfirmPassword).ApplyConfirmPasswordRules(x => x.Password, true);
-            RuleFor(x => x.PhoneNumber).ApplyPhoneNumberRules(true);
+            RuleFor(x => x.FirstName).Required();
+            RuleFor(x => x.LastName).Required();
+            RuleFor(x => x.Email).Required();
+            RuleFor(x => x.Password).Required();
+            RuleFor(x => x.ConfirmPassword).Required();
+
+
+
+
+            When(x => !string.IsNullOrWhiteSpace(x.FirstName), () => {
+                RuleFor(x => x.FirstName).ApplyNameRules();
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.LastName), () => {
+                RuleFor(x => x.LastName).ApplyNameRules();
+            });
+
+
+            When(x => !string.IsNullOrWhiteSpace(x.Email), () => {
+                RuleFor(x => x.Email).ApplyEmailRules();
+            });
+
+
+            When(x => !string.IsNullOrWhiteSpace(x.Password), () => {
+                RuleFor(x => x.Password).ApplyPasswordRules(passwordSettings);
+            });
+
+
+            When(x =>
+                !string.IsNullOrWhiteSpace(x.Password) &&
+                !string.IsNullOrWhiteSpace(x.ConfirmPassword),
+                () => {
+                    RuleFor(x => x.ConfirmPassword).ApplyConfirmPasswordRules(x => x.Password);
+                });
+
+            When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber), () => {
+                RuleFor(x => x.PhoneNumber).ApplyPhoneNumberRules();
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.Address), () => {
+                RuleFor(x => x.Address).ApplyAddressRules();
+            });
         }
     }
 }

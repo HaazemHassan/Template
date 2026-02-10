@@ -1,6 +1,7 @@
 using FluentValidation;
 using YallaKhadra.Core.Extensions.Validations;
 using YallaKhadra.Core.Features.Users.Queries.Models;
+using YallaKhadra.Core.ValidationsRules.Common;
 
 namespace YallaKhadra.Core.Features.Users.Queries.Validators {
     public class CheckEmailAvailabilityValidator : AbstractValidator<CheckEmailAvailabilityQuery> {
@@ -9,7 +10,12 @@ namespace YallaKhadra.Core.Features.Users.Queries.Validators {
         }
 
         public void ApplyValidationRules() {
-            RuleFor(x => x.Email).ApplyEmailRules(isRequired: true);
+            RuleFor(x => x.Email).Required();
+            When(x => !string.IsNullOrWhiteSpace(x.Email), () =>
+            {
+                RuleFor(x => x.Email)
+                    .ApplyEmailRules();
+            });
         }
     }
 }

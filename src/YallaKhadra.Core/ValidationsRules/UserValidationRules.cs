@@ -6,16 +6,11 @@ namespace YallaKhadra.Core.Extensions.Validations {
     public static class UserValidationRules {
         public static IRuleBuilderOptions<T, string?> ApplyNameRules<T>(
             this IRuleBuilder<T, string?> ruleBuilder,
-            bool isRequired = false,
             int minLength = 3,
             int maxLength = 15
         ) {
             var rule = ruleBuilder;
 
-            if (isRequired) {
-                rule = rule.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
 
             return rule
                 .MinimumLength(minLength)
@@ -28,15 +23,11 @@ namespace YallaKhadra.Core.Extensions.Validations {
 
 
         public static IRuleBuilderOptions<T, string?> ApplyEmailRules<T>(
-            this IRuleBuilder<T, string> ruleBuilder,
-            bool isRequired = false
+            this IRuleBuilder<T, string> ruleBuilder
         ) {
             var rule = ruleBuilder;
 
-            if (isRequired) {
-                rule = rule.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
+
 
             return rule
                 .MaximumLength(100)
@@ -48,14 +39,9 @@ namespace YallaKhadra.Core.Extensions.Validations {
 
         public static IRuleBuilderOptions<T, string?> ApplyPasswordRules<T>(
              this IRuleBuilder<T, string> ruleBuilder,
-             PasswordSettings settings,
-             bool isRequired = false
+             PasswordSettings settings
         ) {
             var rule = (IRuleBuilderOptions<T, string>)ruleBuilder;
-            if (isRequired) {
-                rule = ruleBuilder.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
 
             rule = rule
                 .MinimumLength(settings.MinLength)
@@ -85,35 +71,23 @@ namespace YallaKhadra.Core.Extensions.Validations {
         }
 
 
-
         public static IRuleBuilderOptions<T, string?> ApplyPhoneNumberRules<T>(
-            this IRuleBuilder<T, string?> ruleBuilder,
-            bool isRequired = false
+            this IRuleBuilder<T, string?> ruleBuilder
         ) {
             var rule = ruleBuilder;
 
-            if (isRequired) {
-                rule = rule.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
 
-            return rule
-                .Must(phone => string.IsNullOrWhiteSpace(phone) || Regex.IsMatch(phone, @"^(\+20|0)(10|11|12|15)[0-9]{8}$"))
+
+            return rule.Must(phone => string.IsNullOrWhiteSpace(phone) || Regex.IsMatch(phone, @"^(\+20|0)(10|11|12|15)[0-9]{8}$"))
                     .WithMessage("Phone number is not valid");
         }
 
 
         public static IRuleBuilderOptions<T, string?> ApplyAddressRules<T>(
             this IRuleBuilder<T, string?> ruleBuilder,
-            bool isRequired = false,
             int maxLength = 200
         ) {
             var rule = ruleBuilder;
-
-            if (isRequired) {
-                rule = rule.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
 
             return rule
                 .MaximumLength(maxLength)
@@ -123,16 +97,9 @@ namespace YallaKhadra.Core.Extensions.Validations {
 
         public static IRuleBuilderOptions<T, string?> ApplyConfirmPasswordRules<T>(
             this IRuleBuilder<T, string?> ruleBuilder,
-            Func<T, string> passwordSelector,
-            bool isRequired = true
+            Func<T, string> passwordSelector
         ) {
             var rule = ruleBuilder;
-
-            if (isRequired) {
-                rule = rule.NotEmpty()
-                    .WithMessage("{PropertyName} can't be empty");
-            }
-
             return rule
                 .Must((model, confirmPassword) => {
                     var password = passwordSelector((T)model);

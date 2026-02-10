@@ -45,8 +45,8 @@ namespace YallaKhadra.Infrastructure.Services {
         }
 
         public async Task<ServiceOperationResult<AuthResult>> SignInWithPassword(string email, string passwod, CancellationToken ct = default) {
-            var userFromDb = await _dbContext.Set<ApplicationUser>().Include(u => u.RefreshTokens).Include(u => u.DomainUser)
-                                .FirstOrDefaultAsync(u => u.Email == email && u.DomainUser!.Email == email, cancellationToken: ct);
+            var userFromDb = await _userManager.Users
+                                .FirstOrDefaultAsync(u => u.Email == email, cancellationToken: ct);
             if (userFromDb is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Invalid Email or password");
 
@@ -67,15 +67,15 @@ namespace YallaKhadra.Infrastructure.Services {
 
             var jwt = ReadJWT(accessToken);
             if (jwt is null)
-                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Can't read this token");
+                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Invalid access token");
 
             var domainUserId = jwt.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
             if (domainUserId is null)
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User id is null");
 
-            var appUser = await _dbContext.Set<ApplicationUser>().Include(au => au.DomainUser).FirstOrDefaultAsync(au => au.DomainUserId.ToString() == domainUserId, cancellationToken: ct);
-            if (appUser is null || appUser.DomainUser is null)
-                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User is not found");
+            var appUser = await _userManager.Users.FirstOrDefaultAsync(au => au.DomainUserId.ToString() == domainUserId, cancellationToken: ct);
+            if (appUser is null)
+                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "User not found");
 
             var currentRefreshToken = await _unitOfWork.RefreshTokens.GetAsync(x => x.AccessTokenJTI == jwt.Id &&
                                                                      x.Token == refreshToken &&
@@ -85,37 +85,13 @@ namespace YallaKhadra.Infrastructure.Services {
                 return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Unauthorized, "Refresh token is not valid");
 
             //new jwt result
-            var jwtResultOperation = await AuthenticateAsync(appUser, currentRefreshToken.Expires);
-            if (!jwtResultOperation.Succeeded || jwtResultOperation.Data is null)
-                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Failed, "Failed to generate new token");
+            var jwtResultOperation = await AuthenticateAsync(appUser, currentRefreshToken!.Expires);
+            if (!jwtResultOperation.Succeeded)
+                return ServiceOperationResult<AuthResult>.Failure(ServiceOperationStatus.Failed, "Some thins went wrong");
 
-            currentRefreshToken.RevokationDate = DateTime.UtcNow;
+            currentRefreshToken.Revoke();
             await _unitOfWork.RefreshTokens.UpdateAsync(currentRefreshToken, ct);
             return jwtResultOperation;
-        }
-
-
-
-        public bool ValidateAccessToken(string token, bool validateLifetime = true) {
-            var tokenValidationParameters = new TokenValidationParameters {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
-                ValidateIssuer = false,
-                ValidateAudience = true,
-                ValidIssuer = _jwtSettings.Issuer,
-                ValidAudience = _jwtSettings.Audience,
-                ValidateLifetime = validateLifetime,
-                ClockSkew = TimeSpan.FromMinutes(2)  //default = 5 min (security gap)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
-
-            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                return false;
-
-            return principal is not null;
         }
 
 
@@ -130,10 +106,10 @@ namespace YallaKhadra.Infrastructure.Services {
 
             var refreshTokenFromDb = await _unitOfWork.RefreshTokens.GetAsync(r => r.Token == refreshToken && r.UserId == appUser.Id, ct);
 
-            if (refreshTokenFromDb == null || !refreshTokenFromDb.IsActive)
+            if (refreshTokenFromDb is null || !refreshTokenFromDb.IsActive)
                 return ServiceOperationResult.Failure(ServiceOperationStatus.NotFound, "You maybe signed out!");
 
-            refreshTokenFromDb.RevokationDate = DateTime.UtcNow;
+            refreshTokenFromDb.Revoke();
             await _unitOfWork.RefreshTokens.UpdateAsync(refreshTokenFromDb, ct);
             return ServiceOperationResult.Success(message: "Logout successfull");
 
@@ -151,7 +127,6 @@ namespace YallaKhadra.Infrastructure.Services {
                 return ServiceOperationResult.Failure(ServiceOperationStatus.Unauthorized, result.Errors.FirstOrDefault()?.Description);
 
             return ServiceOperationResult.Success(ServiceOperationStatus.Updated);
-
 
         }
 
@@ -231,6 +206,28 @@ namespace YallaKhadra.Infrastructure.Services {
             };
 
 
+        }
+
+        private bool ValidateAccessToken(string token, bool validateLifetime = true) {
+            var tokenValidationParameters = new TokenValidationParameters {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+                ValidateIssuer = false,
+                ValidateAudience = true,
+                ValidIssuer = _jwtSettings.Issuer,
+                ValidAudience = _jwtSettings.Audience,
+                ValidateLifetime = validateLifetime,
+                ClockSkew = TimeSpan.FromMinutes(2)  //default = 5 min (security gap)
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                return false;
+
+            return principal is not null;
         }
         private async Task AddRefreshTokenToDatabase(RefreshTokenDTO refreshTokenDTO, string accessTokenJti) {
             var refreshToken = new RefreshToken {

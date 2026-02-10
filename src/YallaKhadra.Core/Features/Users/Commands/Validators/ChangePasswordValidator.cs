@@ -2,6 +2,7 @@
 using YallaKhadra.Core.Bases.Authentication;
 using YallaKhadra.Core.Extensions.Validations;
 using YallaKhadra.Core.Features.Users.Commands.RequestModels;
+using YallaKhadra.Core.ValidationsRules.Common;
 
 namespace YallaKhadra.Core.Features.Users.Commands.Validators {
     public class ChangePasswordValidator : AbstractValidator<ChangePasswordCommand> {
@@ -10,11 +11,26 @@ namespace YallaKhadra.Core.Features.Users.Commands.Validators {
         }
 
         private void ApplyValidationRules(PasswordSettings passwordSettings) {
+            RuleFor(x => x.CurrentPassword).Required();
+            RuleFor(x => x.NewPassword).Required();
+            RuleFor(x => x.ConfirmNewPassword).Required();
 
-            RuleFor(x => x.CurrentPassword).ApplyPasswordRules(passwordSettings, true);
-            RuleFor(x => x.NewPassword).ApplyPasswordRules(passwordSettings, true);
-            RuleFor(x => x.ConfirmNewPassword).ApplyConfirmPasswordRules(x => x.NewPassword, true);
 
+
+            When(x => !string.IsNullOrWhiteSpace(x.CurrentPassword), () => {
+                RuleFor(x => x.CurrentPassword)
+                    .ApplyPasswordRules(passwordSettings);
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.NewPassword), () => {
+                RuleFor(x => x.NewPassword)
+                    .ApplyPasswordRules(passwordSettings);
+            });
+
+            When(x => !string.IsNullOrWhiteSpace(x.NewPassword) && !string.IsNullOrWhiteSpace(x.ConfirmNewPassword), () => {
+                RuleFor(x => x.ConfirmNewPassword)
+                    .ApplyConfirmPasswordRules(x => x.NewPassword);
+            });
         }
     }
 }

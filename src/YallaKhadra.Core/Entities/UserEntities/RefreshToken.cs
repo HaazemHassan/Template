@@ -12,5 +12,9 @@ namespace YallaKhadra.Core.Entities {
         public bool IsActive => RevokationDate is null && !IsExpired;
 
         public DateTime CreatedAt { get; set; }
+
+        public void Revoke() {
+            RevokationDate = DateTime.UtcNow;
+        }
     }
 }
